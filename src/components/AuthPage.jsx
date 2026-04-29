@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import API_BASE_URL from "../config/api";
-
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import API_BASE_URL from "../config/api";
 
 const AuthPage = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
-  // Додали email у початковий стан
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,20 +15,27 @@ const AuthPage = ({ onLoginSuccess }) => {
     const path = isLogin ? 'login' : 'register';
     
     try {
-      // Бекенд очікує об'єкт з username, email (для реєстрації) та password
       const res = await axios.post(`${API_BASE_URL}/api/auth/${path}`, formData);
       
       if (isLogin) {
         localStorage.setItem('token', res.data.access_token);
         onLoginSuccess(res.data.access_token);
+        navigate('/'); 
       } else {
-        alert("Реєстрація успішна! Тепер увійдіть за допомогою свого логіну.");
+        alert("Registration successful! Please log in with your credentials.");
         setIsLogin(true);
+        setFormData({ username: '', email: '', password: '' });
       }
-    } catch (err) {
-      // Виводимо конкретну помилку від Flask (наприклад, "Користувач вже існує")
-      setError(err.response?.data?.error || "Сталася помилка. Перевірте з'єднання з сервером.");
-    }
+    } //  catch (err) {
+    //   setError(err.response?.data?.error || "An error occurred. Please check your connection.");
+    // }
+          catch (err) {
+        setError(
+          err.response?.data?.detail ||
+          err.response?.data?.error ||
+          "An error occurred. Please check your connection."
+        );
+      }
   };
 
   return (
@@ -39,42 +46,53 @@ const AuthPage = ({ onLoginSuccess }) => {
       border: '1px solid #ddd', 
       borderRadius: '12px',
       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#fff'
     }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-        {isLogin ? 'Вхід у систему' : 'Створити акаунт'}
+      <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>
+        {isLogin ? 'Sign In' : 'Create Account'}
       </h2>
 
-      {error && <p style={{ color: '#d9534f', background: '#f9dfde', padding: '10px', borderRadius: '4px', fontSize: '14px' }}>{error}</p>}
+      {error && (
+        <p style={{ 
+          color: '#d9534f', 
+          background: '#f9dfde', 
+          padding: '10px', 
+          borderRadius: '4px', 
+          fontSize: '14px',
+          textAlign: 'center' 
+        }}>
+          {error}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <input 
           type="text" 
-          placeholder="Логін (username)" 
+          placeholder="Username" 
           value={formData.username}
           onChange={(e) => setFormData({...formData, username: e.target.value})}
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+          style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc' }}
           required 
         />
 
-        {/* ПРИХОВАНЕ ПОЛЕ EMAIL: показуємо тільки при реєстрації */}
         {!isLogin && (
           <input 
             type="email" 
-            placeholder="Електронна пошта" 
+            placeholder="Email Address" 
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
-            style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc' }}
             required 
           />
         )}
 
         <input 
           type="password" 
-          placeholder="Пароль" 
+          placeholder="Password" 
           value={formData.password}
           onChange={(e) => setFormData({...formData, password: e.target.value})}
-          style={{ padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+          style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc' }}
           required 
         />
 
@@ -86,23 +104,29 @@ const AuthPage = ({ onLoginSuccess }) => {
           borderRadius: '4px', 
           cursor: 'pointer',
           fontWeight: 'bold',
-          fontSize: '16px'
+          fontSize: '16px',
+          marginTop: '10px',
+          transition: 'background 0.3s'
         }}>
-          {isLogin ? 'Увійти' : 'Зареєструватися'}
+          {isLogin ? 'Login' : 'Register'}
         </button>
       </form>
 
-      <p onClick={() => {
-        setIsLogin(!isLogin);
-        setError(''); // Очищуємо помилки при перемиканні
-      }} style={{ 
-        cursor: 'pointer', 
-        color: '#007bff', 
-        marginTop: '20px', 
-        textAlign: 'center',
-        fontSize: '14px'
-      }}>
-        {isLogin ? 'Ще не маєте акаунту? Реєстрація' : 'Вже є акаунт? Увійти'}
+      <p 
+        onClick={() => {
+          setIsLogin(!isLogin);
+          setError('');
+        }} 
+        style={{ 
+          cursor: 'pointer', 
+          color: '#007bff', 
+          marginTop: '20px', 
+          textAlign: 'center',
+          fontSize: '14px',
+          textDecoration: 'underline'
+        }}
+      >
+        {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
       </p>
     </div>
   );

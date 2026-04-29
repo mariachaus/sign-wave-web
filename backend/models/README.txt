@@ -1,1 +1,2 @@
-_lmty as suffix means love mother thank-you classes (old)
+_lmty  means love mother thank-you classes (old)
+flmpt-y means father love mother please thank-you classes (new)

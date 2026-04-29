@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 from flask import Blueprint, request, jsonify
 
+
 # Створюємо Blueprint замість app
 ml_bp = Blueprint('ml_bp', __name__)
 
@@ -12,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 1. ЗАВАНТАЖЕННЯ МОДЕЛІ
 model = None
-model_path = os.path.join(BASE_DIR, './models/sign_language_model2_lmty.h5') 
+model_path = os.path.join(BASE_DIR, './models/sign_language_model_flmpt-y.h5') 
 
 if os.path.exists(model_path):
     try:
@@ -25,7 +26,7 @@ else:
 
 # 2. ЗАВАНТАЖЕННЯ НАЗВ ЖЕСТІВ
 LABELS = []
-labels_path = os.path.join(BASE_DIR, './models/gesture_classes_lmty.json')
+labels_path = os.path.join(BASE_DIR, './models/gesture_classes_flmpt-y.json')
 
 if os.path.exists(labels_path):
     with open(labels_path, 'r', encoding='utf-8') as f:

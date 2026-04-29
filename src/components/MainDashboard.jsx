@@ -14,11 +14,32 @@ const MainDashboard = ({ models }) => {
 
   return (
     <>
-      <nav style={{ marginBottom: '20px', padding: '10px', background: '#f5f5f5' }}>
+      <nav style={{ 
+        marginBottom: '20px', 
+        padding: '10px', 
+        background: '#f5f5f5',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+      }}>
         <button onClick={() => setTab('image')}>🖼️ Image Mode</button>
         <button onClick={() => setTab('webcam')}>🎥 Webcam Mode</button>
         <button onClick={() => setTab('videoData')}>🎬 Video Data</button>
-        <button onClick={() => navigate('/profile')} style={{marginLeft: '20px', fontWeight: 'bold'}}>👤 My Profile</button>
+        
+        {/* Нова кнопка переходу до бібліотеки жестів */}
+        <button 
+          onClick={() => navigate('/gestures')} 
+          style={{ background: '#e0e0e0', fontWeight: '500' }}
+        >
+          📖 Gesture Library
+        </button>
+
+        <button 
+          onClick={() => navigate('/profile')} 
+          style={{ marginLeft: 'auto', fontWeight: 'bold' }}
+        >
+          👤 My Profile
+        </button>
       </nav>
 
       <section id="demos">
@@ -26,7 +47,11 @@ const MainDashboard = ({ models }) => {
           <div className="image-mode">
             <h1>Image Detection</h1>
             <div className="upload-grid">
-              <ImageBlock poseModel={models.image.pose} handModel={models.image.hand} onAddRecord={(r) => setImageDataset(prev => [...prev, r])} />
+              <ImageBlock 
+                poseModel={models.image.pose} 
+                handModel={models.image.hand} 
+                onAddRecord={(r) => setImageDataset(prev => [...prev, r])} 
+              />
             </div>
             <button onClick={() => downloadCSVDataset(imageDataset)}>💾 Download CSV</button>
           </div>
@@ -42,7 +67,11 @@ const MainDashboard = ({ models }) => {
         {tab === 'videoData' && (
           <div className="video-data-mode">
             <h1>Extract Sequences</h1>
-            <VideoUploadBlock poseModel={models.video.pose} handModel={models.video.hand} onAddSequence={(s) => setVideoDataset(prev => [...prev, s])} />
+            <VideoUploadBlock 
+              poseModel={models.video.pose} 
+              handModel={models.video.hand} 
+              onAddSequence={(s) => setVideoDataset(prev => [...prev, s])} 
+            />
             <button onClick={() => downloadJSONDataset(videoDataset)}>💾 Download JSON</button>
           </div>
         )}

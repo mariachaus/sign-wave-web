@@ -15,19 +15,20 @@ class User(db.Model):
     google_id = db.Column(db.String, unique=True)
     avatar_url = db.Column(db.String)
     total_xp = db.Column(db.Integer, default=0)
+    role = db.Column(db.String(20), nullable=False, default='user')
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Зв'язки
-    settings = db.relationship('UserSetting', backref='user', uselist=False)
-    streak = db.relationship('UserStreak', backref='user', uselist=False)
-    achievements = db.relationship('UserAchievement', backref='user')
-    xp_logs = db.relationship('UserXPLog', backref='user')
-    gesture_stats = db.relationship('UserGestureStat', backref='user')
-    lesson_progress = db.relationship('UserLessonProgress', backref='user')
-    lesson_attempts = db.relationship('UserLessonAttempt', backref='user')
-    error_logs = db.relationship('UserErrorLog', backref='user')
-    daily_tasks = db.relationship('UserDailyTask', backref='user')
+    settings = db.relationship('UserSetting', backref='user', uselist=False, cascade="all, delete-orphan")
+    streak = db.relationship('UserStreak', backref='user', uselist=False, cascade="all, delete-orphan")
+    achievements = db.relationship('UserAchievement', backref='user', cascade="all, delete-orphan")
+    xp_logs = db.relationship('UserXPLog', backref='user', cascade="all, delete-orphan")
+    gesture_stats = db.relationship('UserGestureStat', backref='user', cascade="all, delete-orphan")
+    lesson_progress = db.relationship('UserLessonProgress', backref='user', cascade="all, delete-orphan")
+    lesson_attempts = db.relationship('UserLessonAttempt', backref='user', cascade="all, delete-orphan")
+    error_logs = db.relationship('UserErrorLog', backref='user', cascade="all, delete-orphan")
+    daily_tasks = db.relationship('UserDailyTask', backref='user', cascade="all, delete-orphan")
 
 class UserSetting(db.Model):
     __tablename__ = "user_settings"
@@ -39,7 +40,7 @@ class UserSetting(db.Model):
     is_landmarks_visible = db.Column(db.Boolean, default=True)
     landmark_color = db.Column(db.String, default='#00FF00')
     camera_fps_limit = db.Column(db.Integer, default=30)
-    is_email_notifications_enabled = db.Column(db.Boolean, default=True)
+    is_email_notifications_enabled = db.Column(db.Boolean, default=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class UserStreak(db.Model):
@@ -88,6 +89,7 @@ class Gesture(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     thumbnail_url = db.Column(db.String(255))
     illustration_url = db.Column(db.String(255))
+    description = db.Column(db.Text)
 
 class Category(db.Model):
     __tablename__ = "categories"

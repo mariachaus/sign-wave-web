@@ -1,90 +1,112 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // Імпортуємо хук для зміни мови
 
-// Імпорт сторінок
 import AuthPage from './components/AuthPage';
 import ProfilePage from './components/ProfilePage';
 import SettingsPage from './components/SettingsPage';
-import MainDashboard from './components/MainDashboard'; // Створимо цей файл нижче
+import MainDashboard from './components/MainDashboard'; 
+import GesturesPage from './components/GesturesPage'; 
+import GestureDetailsPage from './components/GestureDetailsPage'; 
+import API_BASE_URL from "./config/api";
 
+import axios from 'axios';
 import './App.scss';
 
 function App() {
+  const { i18n } = useTranslation(); // Отримуємо об'єкт керування мовою
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [models, setModels] = useState({
-    image: { pose: null, hand: null },
-    video: { pose: null, hand: null }
-  });
+  const [models, setModels] = useState({ image: { pose: null, hand: null }, video: { pose: null, hand: null } });
   const [isLoaded, setIsLoaded] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.clear(); 
     setToken(null);
     setIsLoaded(false);
+    window.location.href = '/auth';
   };
 
   useEffect(() => {
     if (!token) return;
 
-    async function initModels() {
-      if (!window.MP_VISION) {
-        setTimeout(initModels, 100);
-        return;
+    async function syncUserSettings() {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/settings/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.data.ui) {
+          const ui = res.data.ui;
+          // Записуємо все у локальне сховище
+          localStorage.setItem('skeleton_color', ui.landmark_color);
+          localStorage.setItem('is_landmarks_visible', ui.is_landmarks_visible);
+          localStorage.setItem('mirror_view', ui.is_mirror_view_enabled);
+          localStorage.setItem('font_size', ui.font_size);
+          
+          // --- РОБОТА З МОВОЮ ---
+          if (ui.language) {
+            localStorage.setItem('i18nextLng', ui.language); // Стандартний ключ для i18next
+            // Змінюємо мову в самому додатку, якщо вона відрізняється
+            if (i18n.language !== ui.language) {
+              i18n.changeLanguage(ui.language);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync settings from DB", err);
       }
+    }
+
+    syncUserSettings();
+
+    async function initModels() {
+      if (!window.MP_VISION) { setTimeout(initModels, 100); return; }
       const { FilesetResolver, PoseLandmarker, HandLandmarker } = window.MP_VISION;
       try {
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-        );
-        
-        // Одноразова ініціалізація всіх моделей (спрощено для прикладу)
+        const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
         const pImg = await PoseLandmarker.createFromOptions(vision, { baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task`, delegate: "GPU" }, runningMode: "IMAGE", numPoses: 1 });
         const hImg = await HandLandmarker.createFromOptions(vision, { baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`, delegate: "GPU" }, runningMode: "IMAGE", numHands: 2 });
         const pVid = await PoseLandmarker.createFromOptions(vision, { baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task`, delegate: "GPU" }, runningMode: "VIDEO", numPoses: 1 });
         const hVid = await HandLandmarker.createFromOptions(vision, { baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`, delegate: "GPU" }, runningMode: "VIDEO", numHands: 2 });
 
-        setModels({
-          image: { pose: pImg, hand: hImg },
-          video: { pose: pVid, hand: hVid }
-        });
+        setModels({ image: { pose: pImg, hand: hImg }, video: { pose: pVid, hand: hVid } });
         setIsLoaded(true);
-      } catch (error) {
-        console.error("Failed to init MediaPipe:", error);
-      }
+      } catch (error) { console.error("Failed to init MediaPipe:", error); }
     }
     initModels();
-  }, [token]);
+  }, [token, i18n]); // Додано i18n у залежності
 
-  if (!token) return <AuthPage onLoginSuccess={(t) => setToken(t)} />;
-  
-  if (!isLoaded) return (
-    <div className="loading-container" style={{ textAlign: 'center', marginTop: '50px' }}>
-      <p>Завантаження штучного інтелекту...</p>
-      <button onClick={handleLogout}>Вийти</button>
-    </div>
-  );
+  const PrivateRoute = ({ children }) => {
+    if (!token) return <Navigate to="/auth" />;
+    if (!isLoaded) return (
+      <div className="loading-container" style={{ textAlign: 'center', marginTop: '50px' }}>
+        <p>Loading models and settings... Please wait</p>
+      </div>
+    );
+    return children;
+  };
 
   return (
     <Router>
       <div className="App">
-        {/* Хедер залишається на всіх сторінках */}
-        <header style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 20px', background: '#333', color: 'white', alignItems: 'center' }}>
-          <h3 style={{margin: 0, cursor: 'pointer'}} onClick={() => window.location.href="/"}>Sign Language Learning</h3>
-          <button onClick={handleLogout} style={{ background: '#ff4d4d', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
-        </header>
+        {token && (
+          <header style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 20px', background: '#333', color: 'white', alignItems: 'center' }}>
+            <h3 style={{margin: 0, cursor: 'pointer'}} onClick={() => window.location.href="/"}>Sign Language</h3>
+            <button onClick={handleLogout} style={{ background: '#ff4d4d', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
+          </header>
+        )}
 
         <Routes>
-          {/* Головна сторінка з режимами (Image, Webcam, Video) */}
-          <Route path="/" element={<MainDashboard models={models} />} />
+          <Route path="/auth" element={!token ? <AuthPage onLoginSuccess={(t) => setToken(t)} /> : <Navigate to="/" />} />
+          <Route path="/" element={<PrivateRoute><MainDashboard models={models} /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><SettingsPage models={models} /></PrivateRoute>} />
           
-          {/* Сторінка профілю */}
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* Ці маршрути також краще захистити PrivateRoute, якщо вони потребують токена для API */}
+          <Route path="/gestures" element={<PrivateRoute><GesturesPage /></PrivateRoute>} />
+          <Route path="/gestures/:id" element={<PrivateRoute><GestureDetailsPage /></PrivateRoute>} />
           
-          {/* Сторінка налаштувань */}
-          <Route path="/settings" element={<SettingsPage />} />
-
-          {/* Редирект якщо шлях невірний */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>
       </div>
     </Router>
