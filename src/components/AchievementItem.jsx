@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/AchievementItem.scss';
+import '../styles/components/AchievementItem.scss';
 
 const AchievementItem = ({ achievement }) => {
   return (

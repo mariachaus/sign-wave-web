@@ -9,15 +9,21 @@ import MainDashboard from './components/MainDashboard';
 import GesturesPage from './components/GesturesPage'; 
 import GestureDetailsPage from './components/GestureDetailsPage'; 
 import API_BASE_URL from "./config/api";
+import { applyTheme } from './utils/theme';
 
 import axios from 'axios';
-import './App.scss';
+import './styles/global.scss';
 
 function App() {
   const { i18n } = useTranslation(); // Отримуємо об'єкт керування мовою
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [models, setModels] = useState({ image: { pose: null, hand: null }, video: { pose: null, hand: null } });
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Apply saved theme immediately on mount
+  useEffect(() => {
+    applyTheme(localStorage.getItem('theme') || 'system');
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear(); 
@@ -42,7 +48,11 @@ function App() {
           localStorage.setItem('is_landmarks_visible', ui.is_landmarks_visible);
           localStorage.setItem('mirror_view', ui.is_mirror_view_enabled);
           localStorage.setItem('font_size', ui.font_size);
-          
+          if (ui.theme) {
+            localStorage.setItem('theme', ui.theme);
+            applyTheme(ui.theme);
+          }
+
           // --- РОБОТА З МОВОЮ ---
           if (ui.language) {
             localStorage.setItem('i18nextLng', ui.language); // Стандартний ключ для i18next
@@ -79,7 +89,7 @@ function App() {
   const PrivateRoute = ({ children }) => {
     if (!token) return <Navigate to="/auth" />;
     if (!isLoaded) return (
-      <div className="loading-container" style={{ textAlign: 'center', marginTop: '50px' }}>
+      <div className="loading-container">
         <p>Loading models and settings... Please wait</p>
       </div>
     );
@@ -90,9 +100,9 @@ function App() {
     <Router>
       <div className="App">
         {token && (
-          <header style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 20px', background: '#333', color: 'white', alignItems: 'center' }}>
-            <h3 style={{margin: 0, cursor: 'pointer'}} onClick={() => window.location.href="/"}>Sign Language</h3>
-            <button onClick={handleLogout} style={{ background: '#ff4d4d', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Logout</button>
+          <header className="app-header">
+            <h3 className="app-header__title" onClick={() => window.location.href="/"}>Sign Language</h3>
+            <button className="app-header__logout" onClick={handleLogout}>Logout</button>
           </header>
         )}
 

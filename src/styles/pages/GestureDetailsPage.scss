@@ -1,0 +1,156 @@
+.gesture-details-page {
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  color: var(--color-text);
+  padding: 20px;
+}
+
+.gesture-details-page--loading,
+.gesture-details-page--error {
+  text-align: center;
+  padding-top: 50px;
+}
+
+.gesture-details-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  transition: background var(--transition), color var(--transition);
+
+  &:hover {
+    background: var(--color-surface-alt);
+    color: var(--color-primary);
+  }
+}
+
+.gesture-details-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.gesture-details-info { flex: 1; }
+
+.gesture-details-title {
+  font-size: 32px;
+  margin: 0 0 5px 0;
+  display: inline;
+}
+
+.gesture-details-synonyms {
+  color: var(--color-text-muted);
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+.gesture-details-description {
+  margin-top: 20px;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 80%;
+  color: var(--color-text-muted);
+}
+
+.gesture-details-illustration {
+  width: 150px;
+  height: 150px;
+  background-color: var(--color-surface-alt);
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 40px;
+  border: 1px solid var(--color-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.gesture-details-video-wrap {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  background-color: #000;
+  border-radius: 15px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+
+  video {
+    width: 100%;
+    height: 100%;
+    /* override global webcam mirror — this is a regular video */
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+  }
+}
+
+.gesture-details-practice {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.practice-btn {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 10px 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: inherit;
+  transition: background 0.2s;
+
+  &:hover { background-color: var(--color-border); }
+}
+
+.gesture-details-similar {
+  border-top: 1px solid var(--color-border);
+  padding-top: 30px;
+
+  h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: var(--color-text);
+  }
+}
+
+.gesture-details-similar__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.gesture-details-error-btn {
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+
+  &:hover { text-decoration: underline; }
+}
+
+@media (max-width: 640px) {
+  .gesture-details-top { flex-direction: column; }
+  .gesture-details-description { max-width: 100%; }
+  .gesture-details-illustration { align-self: center; }
+}

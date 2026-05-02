@@ -1,4 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { extractFeatures } from '../utils/feature_extractor'; // Імпортуй функцію
+import API_BASE_URL from "../config/api"; // Імпортуй конфіг
+
 const MP = window.MP_VISION || {};
 const DrawingUtils = MP.DrawingUtils;
 const PoseLandmarker = MP.PoseLandmarker;
@@ -6,13 +9,19 @@ const HandLandmarker = MP.HandLandmarker;
 
 import { drawAllLandmarks } from '../utils/drawing_utils';
 
-const WebcamAnalyzer = ({ poseModel, handModel }) => {
+const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isWebcamRunning, setIsWebcamRunning] = useState(false);
   const requestRef = useRef();
 
-  // Функція циклічного аналізу
+  const [prediction, setPrediction] = useState({ label: '', confidence: 0 });
+
+  // ML Refs
+  const frameBuffer = useRef([]); 
+  const isPredicting = useRef(false);
+
+  // Оновлена функція аналізу
   const predictWebcam = async () => {
     if (!videoRef.current || !canvasRef.current || !poseModel || !handModel) return;
 
@@ -21,14 +30,28 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
     const ctx = canvas.getContext("2d");
     const drawingUtils = new DrawingUtils(ctx);
 
-    if (video.readyState >= 2) { // Перевірка, що відео готове
+    if (video.readyState >= 2) {
       const startTimeMs = performance.now();
       
-      // Отримуємо результати від MediaPipe
+      // 1. Отримуємо дані від MediaPipe
       const handResult = handModel.detectForVideo(video, startTimeMs);
       const poseResult = await new Promise(resolve => poseModel.detectForVideo(video, startTimeMs, resolve));
 
-      // Очищення та малювання (колір та видимість беруться всередині drawAllLandmarks з localStorage)
+      // 2. ML ЛОГІКА: Збираємо фічі, якщо не йде активний запит
+      if (!isPredicting.current) {
+        const currentFrameFeatures = extractFeatures(poseResult, handResult);
+        frameBuffer.current.push(currentFrameFeatures);
+
+        // Коли назбирали вікно у 30 кадрів
+        if (frameBuffer.current.length === 30) {
+          // Відправляємо копію буфера на бекенд
+          sendToPredict([...frameBuffer.current]);
+          // Зсуваємо вікно на 5 кадрів (можна на 1, але 5 зменшить навантаження)
+          frameBuffer.current = frameBuffer.current.slice(5); 
+        }
+      }
+
+      // 3. Малювання скелета
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawAllLandmarks(
         drawingUtils, 
@@ -42,15 +65,65 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
     requestRef.current = requestAnimationFrame(predictWebcam);
   };
 
-  // Увімкнення/Вимкнення камери
+const sendToPredict = async (features) => {
+  isPredicting.current = true;
+  try {
+    const response = await fetch(`${API_BASE_URL}/ml/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ features: features })
+    });
+    const result = await response.json();
+    
+    // 1. Оновлюємо стан тільки якщо нейронка хоч трохи впевнена (>30%)
+    // Це прибере "стрибки" тексту на порожньому місці
+    if (result.confidence > 0.3) {
+      setPrediction({ 
+        label: result.label, 
+        confidence: result.confidence 
+      });
+    }
+
+    // 2. Якщо жест розпізнано чітко
+    if (result.confidence > 0.8) {
+      if (onGestureDetected) onGestureDetected(result.label);
+      
+      // Фіксуємо результат на 3 секунди, щоб користувач встиг побачити успіх
+      // Протягом цих 3 секунд нові передбачення не будуть заважати (якщо додати прапорець)
+    }
+  } catch (e) {
+    console.error("ML Server Error:", e);
+  } finally {
+    isPredicting.current = false;
+  }
+};
+
   const toggleWebcam = async () => {
     if (isWebcamRunning) {
+      // 1. Зупиняємо відеопотік
       const stream = videoRef.current.srcObject;
       if (stream) stream.getTracks().forEach(track => track.stop());
       videoRef.current.srcObject = null;
+      
+      // 2. Зупиняємо цикл анімації
       cancelAnimationFrame(requestRef.current);
+      
+      // 3. Очищуємо Canvas (тираємо скелет)
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 4. Скидаємо передбачення (тираємо текст)
+      setPrediction({ label: '', confidence: 0 });
+
+      // 5. Очищуємо буфер кадрів
+      frameBuffer.current = []; 
+      
       setIsWebcamRunning(false);
     } else {
+      // Логіка старту (залишається без змін)
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         videoRef.current.srcObject = stream;
@@ -59,13 +132,11 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
         };
         setIsWebcamRunning(true);
       } catch (err) {
-        console.error("Error accessing webcam:", err);
-        alert("Could not access webcam. Please check permissions.");
+        console.error("Webcam Error:", err);
       }
     }
   };
 
-  // Очищення при видаленні компонента
   useEffect(() => {
     return () => {
       cancelAnimationFrame(requestRef.current);
@@ -75,7 +146,6 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
     };
   }, []);
 
-  // Отримуємо параметр дзеркального відображення з localStorage
   const isMirror = localStorage.getItem('mirror_view') !== 'false';
 
   return (
@@ -83,13 +153,9 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
       <div style={{ position: 'relative', width: '100%', maxWidth: '640px', margin: '0 auto' }}>
         <video 
           ref={videoRef} 
-          autoPlay 
-          playsInline 
-          muted 
+          autoPlay playsInline muted 
           style={{ 
-            width: '100%', 
-            borderRadius: '12px', 
-            transform: isMirror ? 'scaleX(-1)' : 'none',
+            width: '100%', borderRadius: '25px', 
             transform: isMirror ? 'scaleX(-1)' : 'none',
             backgroundColor: '#000'
           }} 
@@ -97,14 +163,29 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
         <canvas 
           ref={canvasRef} 
           style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            width: '100%', 
-            height: '100%', 
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
             transform: isMirror ? 'scaleX(-1)' : 'none' 
           }} 
         />
+        {/* Блок з результатом передбачення */}
+{prediction.label && (
+  <div style={{
+    position: 'absolute',
+    bottom: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    color: prediction.confidence > 0.8 ? '#00FF00' : '#FFD700', // Зелений якщо ок, жовтий якщо думає
+    padding: '10px 20px',
+    borderRadius: '15px',
+    fontSize: '20px',
+    fontWeight: 'bold',
+    zIndex: 10,
+    border: `2px solid ${prediction.confidence > 0.8 ? '#00FF00' : '#FFD700'}`
+  }}>
+    {prediction.label.toUpperCase()} ({(prediction.confidence * 100).toFixed(0)}%)
+  </div>
+)}
       </div>
 
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
@@ -113,15 +194,11 @@ const WebcamAnalyzer = ({ poseModel, handModel }) => {
           style={{ 
             padding: '12px 24px', 
             backgroundColor: isWebcamRunning ? '#dc3545' : '#28a745', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '25px', 
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+            color: 'white', border: 'none', borderRadius: '25px', 
+            cursor: 'pointer', fontWeight: 'bold'
           }}
         >
-          {isWebcamRunning ? "🛑 Stop Camera" : "📷 Start Camera Test"}
+          {isWebcamRunning ? "🛑 Stop Camera" : "📷 Start Camera"}
         </button>
       </div>
     </div>

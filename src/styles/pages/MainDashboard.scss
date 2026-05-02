@@ -1,0 +1,89 @@
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--color-surface, #fff);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+
+  &:hover {
+    background: #f0f9fa;
+    color: var(--color-primary, #007f8b);
+    border-color: #b2dfdb;
+  }
+
+  &.active {
+    background: var(--color-primary, #007f8b);
+    color: white;
+    border-color: var(--color-primary, #007f8b);
+  }
+}
+
+.nav-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-primary, #007f8b);
+  background: transparent;
+  color: var(--color-primary, #007f8b);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+  transition: background 0.18s, color 0.18s;
+
+  &:hover {
+    background: var(--color-primary, #007f8b);
+    color: white;
+  }
+}
+
+.dashboard-content {
+  padding: 24px;
+
+  h1 { font-size: 1.5rem; margin-bottom: 20px; }
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--color-secondary, #37527d);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+
+  &:hover { background: var(--color-secondary-dark, #2c4169); }
+}
+
+@media screen and (max-width: 640px) {
+  .main-nav { gap: 4px; padding: 8px 12px; }
+  .nav-tab { font-size: 12px; padding: 6px 10px; }
+  .nav-profile-btn { font-size: 12px; padding: 6px 10px; }
+  .dashboard-content { padding: 16px; }
+}

@@ -1,0 +1,94 @@
+.achievement-wrapper {
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+}
+
+.achievement-card {
+  position: relative;
+  width: 80px;
+  cursor: help;
+
+  &:hover {
+    .achievement-icon-shape {
+      transform: translateY(-5px) scale(1.1);
+    }
+    .achievement-tooltip {
+      visibility: visible;
+      opacity: 1;
+      bottom: 110%;
+    }
+  }
+}
+
+.achievement-icon-container {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-icon-shape {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  }
+
+  .default-icon { font-size: 40px; }
+}
+
+.achievement-title {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+}
+
+.achievement-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: 160px;
+  background-color: rgba(33, 33, 33, 0.98);
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px;
+  position: absolute;
+  z-index: 9999;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 95%;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #212121 transparent transparent transparent;
+  }
+
+  .tooltip-description { margin: 0; font-size: 12px; line-height: 1.4; }
+  .tooltip-reward { margin-top: 6px; font-size: 11px; font-weight: bold; color: #ffca28; }
+  .tooltip-date { font-size: 10px; color: #bbb; margin-top: 4px; }
+}
