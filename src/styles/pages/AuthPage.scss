@@ -3,23 +3,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #ede9fe 100%);
+  background: var(--color-bg); /* Вже використовує змінну */
   padding: 20px;
+  transition: background var(--transition);
 }
 
 .auth-container {
   width: 100%;
   max-width: 420px;
-  background: #fff;
-  border-radius: 16px;
+  background: var(--color-surface); /* Замінено #fff */
+  border-radius: var(--radius-lg); /* Використовуємо ваш токен радіуса */
   padding: 40px 36px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg); /* Замінено статичну тінь */
+  border: 1px solid var(--color-border); /* Замінено прозорий чорний */
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 
   h2 {
     text-align: center;
     margin: 0 0 28px;
-    color: #1e293b;
+    color: var(--color-text); /* Замінено #1e293b */
     font-size: 1.6rem;
     font-weight: 700;
     clear: none;
@@ -27,11 +29,14 @@
 }
 
 .auth-error {
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  color: var(--color-danger); /* Замінено #dc2626 */
+  background: var(--color-danger-dark); /* Можна використати dark або підібрати світлий варіант */
+  /* Оскільки у вас немає спеціальної змінної для bg помилки в dark theme, 
+     краще використати напівпрозорий колір або light версію */
+  background: var(--color-primary-light); 
+  border: 1px solid var(--color-danger);
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   text-align: center;
   margin-bottom: 16px;
@@ -45,21 +50,23 @@
   input {
     width: 100%;
     padding: 12px 16px;
-    border-radius: 8px;
-    border: 1.5px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--color-border); /* Замінено #e2e8f0 */
     font-size: 15px;
-    color: #333;
-    background: #fafafa;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--color-text); /* Замінено #333 */
+    background: var(--color-surface-alt); /* Замінено #fafafa */
+    transition: all var(--transition);
     outline: none;
     font-family: inherit;
 
-    &::placeholder { color: #94a3b8; }
+    &::placeholder { 
+      color: var(--color-text-subtle); /* Замінено #94a3b8 */
+    }
 
     &:focus {
-      border-color: var(--color-primary, #007f8b);
-      box-shadow: 0 0 0 3px rgba(0, 127, 139, 0.15);
-      background: #fff;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+      background: var(--color-surface);
     }
   }
 }
@@ -67,29 +74,72 @@
 .auth-submit-btn {
   margin-top: 6px;
   padding: 13px;
-  background: var(--color-primary, #007f8b);
-  color: white;
+  background: var(--color-primary);
+  color: #fff; /* Текст на кнопці зазвичай лишається білим для контрасту */
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 600;
   font-size: 16px;
   letter-spacing: 0.3px;
-  transition: background 0.2s, transform 0.1s;
+  transition: all var(--transition);
   font-family: inherit;
 
-  &:hover { background: var(--color-primary-dark, #006873); }
-  &:active { transform: scale(0.98); }
+  &:hover { 
+    background: var(--color-primary-dark); 
+  }
+  
+  &:active { 
+    transform: scale(0.98); 
+  }
 }
 
 .auth-toggle {
   cursor: pointer;
-  color: var(--color-primary, #007f8b);
+  color: var(--color-primary);
   margin-top: 20px;
   text-align: center;
   font-size: 14px;
   text-decoration: underline;
   user-select: none;
+  transition: color var(--transition);
 
-  &:hover { color: var(--color-primary-dark, #006873); }
+  &:hover { 
+    color: var(--color-primary-dark); 
+  }
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+
+  input {
+    // Додаємо відступ справа, щоб текст не заходив під іконку
+    padding-right: 48px !important; 
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    transition: color var(--transition);
+    z-index: 2;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+
+    svg {
+      display: block;
+    }
+  }
 }

@@ -5,44 +5,63 @@
   color: var(--color-text);
 }
 
-.gestures-page__header,
-.gestures-back-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 40px;
-
-  h1, h2 { margin: 0; color: var(--color-text); }
-}
-
-.gestures-page__back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--color-text);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-  transition: background var(--transition), color var(--transition);
-
-  &:hover {
-    background: var(--color-surface-alt);
-    color: var(--color-primary);
-  }
-}
-
-.gestures-page__title {
-  font-size: 36px;
-  font-weight: bold;
-  margin: 0;
-  color: var(--color-text);
-}
 
 .gesture-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px 0;
+    
+    // Додаємо ховер на весь заголовок для зручності
+    &:hover {
+      .gesture-section__arrow {
+        color: var(--color-primary);
+      }
+      .gesture-section__title-text {
+        color: var(--color-primary);
+      }
+    }
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0; // Скидаємо стандартні відступи h2
+    font-size: 1.25rem;
+    color: var(--color-text);
+    transition: color var(--transition);
+    flex-shrink: 0;
+  }
+
+  &__arrow {
+    transition: transform 0.3s ease, color var(--transition);
+    color: var(--color-text-subtle);
+    display: block; // Щоб transform працював коректно
+
+    // Якщо розгорнуто (default) - стрілка вниз
+    // Якщо згорнуто - повертаємо вліво (або вправо)
+    &.is-collapsed {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &__divider {
+    flex-grow: 1;
+    height: 1px;
+    background: var(--color-border);
+    opacity: 0.6;
+  }
+
+  &__count {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
 }
 
 .gesture-section__header {
@@ -57,7 +76,7 @@
 
 .gesture-section__title {
   color: var(--color-text);
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 600;
   text-transform: capitalize;
   margin: 0;
@@ -69,7 +88,7 @@
   margin-right: 12px;
   display: inline-block;
   transition: transform 0.2s ease;
-  font-size: 18px;
+  font-size: 1.125rem;
 
   &.rotated { transform: rotate(-90deg); }
 }
@@ -84,7 +103,7 @@
 .gesture-section__count {
   margin-left: 16px;
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   white-space: nowrap;
 }
 

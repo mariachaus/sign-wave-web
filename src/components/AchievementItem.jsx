@@ -1,10 +1,10 @@
 import React from 'react';
 import '../styles/components/AchievementItem.scss';
 
-const AchievementItem = ({ achievement }) => {
+const AchievementItem = ({ achievement, locked = false }) => {
   return (
     <div className="achievement-wrapper">
-      <div className="achievement-card">
+      <div className={`achievement-card${locked ? ' achievement-card--locked' : ''}`}>
         {/* Блок з іконкою (тільки тут працює clip-path) */}
         <div className="achievement-icon-container">
           <div className="achievement-icon-shape">

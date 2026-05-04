@@ -5,11 +5,16 @@ import { useTranslation } from 'react-i18next'; // Імпортуємо хук �
 import AuthPage from './components/AuthPage';
 import ProfilePage from './components/ProfilePage';
 import SettingsPage from './components/SettingsPage';
-import MainDashboard from './components/MainDashboard'; 
-import GesturesPage from './components/GesturesPage'; 
-import GestureDetailsPage from './components/GestureDetailsPage'; 
+import MainDashboard from './components/MainDashboard';
+import GesturesPage from './components/GesturesPage';
+import GestureDetailsPage from './components/GestureDetailsPage';
+import LevelsPage from './components/LevelsPage';
+import LessonPage from './components/LessonPage';
+import PracticePage from './components/PracticePage';
+import AchievementsPage from './components/AchievementsPage';
+import AdminPage from './components/AdminPage';
 import API_BASE_URL from "./config/api";
-import { applyTheme } from './utils/theme';
+import { applyTheme, applyFontSize } from './utils/theme';
 
 import axios from 'axios';
 import './styles/global.scss';
@@ -19,16 +24,19 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [models, setModels] = useState({ image: { pose: null, hand: null }, video: { pose: null, hand: null } });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Apply saved theme immediately on mount
   useEffect(() => {
     applyTheme(localStorage.getItem('theme') || 'system');
+    applyFontSize(localStorage.getItem('font_size') || 1.0);
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear(); 
+    localStorage.clear();
     setToken(null);
     setIsLoaded(false);
+    setIsAdmin(false);
     window.location.href = '/auth';
   };
 
@@ -37,6 +45,11 @@ function App() {
 
     async function syncUserSettings() {
       try {
+        const profileRes = await axios.get(`${API_BASE_URL}/api/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (profileRes.data.role === 'admin') setIsAdmin(true);
+
         const res = await axios.get(`${API_BASE_URL}/api/settings/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -48,6 +61,7 @@ function App() {
           localStorage.setItem('is_landmarks_visible', ui.is_landmarks_visible);
           localStorage.setItem('mirror_view', ui.is_mirror_view_enabled);
           localStorage.setItem('font_size', ui.font_size);
+          applyFontSize(ui.font_size);
           if (ui.theme) {
             localStorage.setItem('theme', ui.theme);
             applyTheme(ui.theme);
@@ -90,7 +104,7 @@ function App() {
     if (!token) return <Navigate to="/auth" />;
     if (!isLoaded) return (
       <div className="loading-container">
-        <p>Loading models and settings... Please wait</p>
+        <p>Loading models and data... Please wait</p>
       </div>
     );
     return children;
@@ -101,8 +115,18 @@ function App() {
       <div className="App">
         {token && (
           <header className="app-header">
-            <h3 className="app-header__title" onClick={() => window.location.href="/"}>Sign Language</h3>
-            <button className="app-header__logout" onClick={handleLogout}>Logout</button>
+            <div className="app-header__logo" onClick={() => window.location.href="/"}>
+              <div className="app-header__logo-icon">🤟</div>
+              <h3 className="app-header__title">SignWave</h3>
+            </div>
+            <div className="app-header__right">
+              {isAdmin && (
+                <button className="app-header__admin-btn" onClick={() => window.location.href="/admin"}>
+                  Admin
+                </button>
+              )}
+              <button className="app-header__logout" onClick={handleLogout}>Log out</button>
+            </div>
           </header>
         )}
 
@@ -115,6 +139,11 @@ function App() {
           {/* Ці маршрути також краще захистити PrivateRoute, якщо вони потребують токена для API */}
           <Route path="/gestures" element={<PrivateRoute><GesturesPage /></PrivateRoute>} />
           <Route path="/gestures/:id" element={<PrivateRoute><GestureDetailsPage /></PrivateRoute>} />
+          <Route path="/learn" element={<PrivateRoute><LevelsPage /></PrivateRoute>} />
+          <Route path="/lesson/:id" element={<PrivateRoute><LessonPage models={models} /></PrivateRoute>} />
+          <Route path="/practice/:gestureId" element={<PrivateRoute><PracticePage models={models} /></PrivateRoute>} />
+          <Route path="/achievements" element={<PrivateRoute><AchievementsPage /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
           
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import API_BASE_URL from "../config/api";
 import WebcamAnalyzer from './WebcamAnalyzer';
-import { applyTheme } from '../utils/theme';
+import { applyTheme, applyFontSize } from '../utils/theme';
 import '../styles/pages/SettingsPage.scss';
 
 const SettingsPage = ({ models }) => {
@@ -90,6 +90,7 @@ const SettingsPage = ({ models }) => {
       });
       i18n.changeLanguage(uiSettings.language);
       applyTheme(uiSettings.theme);
+      applyFontSize(uiSettings.font_size);
       showStatus(t('status_settings_saved'), 'success');
       syncLocalData(dataToSave);
     } catch (err) {
@@ -158,14 +159,14 @@ const SettingsPage = ({ models }) => {
 
   return (
     <div className="settings-container">
-      <div className="settings-header">
-        <button className="settings-back-btn" onClick={handleBack} aria-label="Go back">
+      <div className="page-header">
+        <button className="page-header__back" onClick={handleBack} aria-label="Go back">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2>{pageTitle}</h2>
+        <h2 className="page-header__title">{pageTitle}</h2>
       </div>
 
       {message.text && (
@@ -204,7 +205,7 @@ const SettingsPage = ({ models }) => {
             {t('text_size')}
             <select value={uiSettings.font_size} onChange={(e) => setUiSettings({ ...uiSettings, font_size: parseFloat(e.target.value) })}>
               <option value="0.8">{t('small')}</option>
-              <option value="1.0">{t('medium')}</option>
+              <option value="1">{t('medium')}</option>
               <option value="1.2">{t('large')}</option>
             </select>
           </div>
@@ -238,7 +239,11 @@ const SettingsPage = ({ models }) => {
           <label className="settings-label">{t('email')}</label>
           <input className="settings-input" type="email" value={profileData.email} onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} />
 
-          <div className="settings-link" onClick={() => setActiveTab('password')}>{t('change_password')} ➜</div>
+          <label className="settings-label">{t('password')}</label>
+          <input className="settings-input settings-input--disabled" type="password" value="••••••••" readOnly disabled />
+          <button className="save-btn secondary change-password-btn" onClick={() => setActiveTab('password')}>
+            {t('change_password')}
+          </button>
 
           <button className="save-btn" onClick={handleUpdateProfile}>{t('save_profile')}</button>
           <button className="save-btn danger" onClick={handleDeleteAccount}>{t('delete_account')}</button>

@@ -4,39 +4,13 @@
   margin: 0 auto;
 }
 
-.settings-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-
-  h2 { margin: 0; font-size: 20px; color: var(--color-text); }
-}
-
-.settings-back-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: var(--radius-md);
-  color: var(--color-text);
-  transition: background var(--transition), color var(--transition);
-
-  &:hover {
-    background: var(--color-surface-alt);
-    color: var(--color-primary);
-  }
-}
 
 .status-message {
   padding: 10px 14px;
   border-radius: var(--radius-md);
   margin-bottom: 15px;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 
   &.success { background-color: #d4edda; color: #155724; }
   &.error   { background-color: #f8d7da; color: #721c24; }
@@ -50,7 +24,7 @@
   padding: 15px 0;
   border-bottom: 1px solid var(--color-border);
   cursor: pointer;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--color-text);
 
   select {
@@ -93,7 +67,7 @@
   display: block;
   margin-top: 15px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text);
 }
 
@@ -106,7 +80,7 @@
   box-sizing: border-box;
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-family: inherit;
 
   &:focus {
@@ -117,13 +91,18 @@
   }
 }
 
-.settings-link {
-  color: var(--color-primary);
-  cursor: pointer;
-  margin: 15px 0;
-  font-size: 14px;
+.settings-input--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: var(--color-surface-alt) !important;
+  color: var(--color-text-muted);
+  letter-spacing: 3px;
+}
 
-  &:hover { text-decoration: underline; }
+.change-password-btn {
+  margin-top: 10px;
+  font-size: 0.875rem;
+  padding: 9px 12px;
 }
 
 /* ===== BUTTONS ===== */
@@ -135,7 +114,7 @@
   border-radius: 20px;
   cursor: pointer;
   margin-top: 20px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-family: inherit;
   transition: background 0.2s;
   background-color: var(--color-secondary);
@@ -148,8 +127,11 @@
   }
 
   &.danger {
-    background-color: var(--color-danger);
-    &:hover { background-color: var(--color-danger-dark); }
+    border: solid 1px;
+    color: #ef4444;
+    border-color: #ef4444;
+    background: transparent; 
+    &:hover { background: rgba(239, 68, 68, 0.1); }
   }
 
   &.secondary {

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import defaultAvatar from "../assets/default-avatar.jpg";
 import AchievementItem from './AchievementItem';
+import StreakCalendar from './StreakCalendar';
 import '../styles/pages/ProfilePage.scss';
 
 const ProfilePage = () => {
@@ -61,14 +62,14 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page">
-      <div className="profile-back-btn">
-        <button className="gestures-page__back" onClick={() => navigate('/')} aria-label="Go back">
+      <div className="page-header">
+        <button className="page-header__back" onClick={() => navigate('/')} aria-label="Go back">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2>{t('back_to_dashboard')}</h2>
+        <h2 className="page-header__title">{t('profile')}</h2>
       </div>
 
       <div className="profile-header">
@@ -97,6 +98,8 @@ const ProfilePage = () => {
         </div>
       </div>
 
+      <StreakCalendar />
+
       <h3 className="section-title">{t('stats')}</h3>
       <div className="stats-grid">
         {[
@@ -114,7 +117,7 @@ const ProfilePage = () => {
 
       <div className="achievements-header">
         <h3>{t('achievements')}</h3>
-        <span className="view-all-link">{t('view_all')}</span>
+        <span className="view-all-link" onClick={() => navigate('/achievements')}>{t('view_all')}</span>
       </div>
 
       <div className="badges-row">

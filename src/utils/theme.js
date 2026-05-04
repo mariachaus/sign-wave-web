@@ -5,3 +5,8 @@ export function applyTheme(theme) {
       : theme || 'light';
   document.documentElement.setAttribute('data-theme', resolved);
 }
+
+export function applyFontSize(scale) {
+  const s = parseFloat(scale) || 1.0;
+  document.documentElement.style.fontSize = Math.round(s * 100) + '%';
+}

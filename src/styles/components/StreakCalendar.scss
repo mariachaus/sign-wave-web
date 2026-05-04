@@ -1,0 +1,117 @@
+.streak-calendar {
+  margin-bottom: 30px;
+}
+
+/* ── navigation ── */
+.streak-calendar__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.streak-calendar__month-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.streak-calendar__nav-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-alt);
+    color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+/* ── day-of-week labels ── */
+.streak-calendar__header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.streak-calendar__day-label {
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+/* ── grid ── */
+.streak-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/* ── cells ── */
+.streak-calendar__cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* current streak */
+  &--current {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+
+    .streak-calendar__day-num { color: #fff; }
+  }
+
+  /* historical streaks */
+  &--history {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    opacity: 0.35;
+
+    .streak-calendar__day-num { color: #fff; }
+  }
+
+  /* today outline */
+  &--today {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+
+    &.streak-calendar__cell--current,
+    &.streak-calendar__cell--history { opacity: 1; }
+  }
+
+  /* days outside the current month */
+  &--outside {
+    opacity: 0.25;
+  }
+
+  /* future days */
+  &--future {
+    opacity: 0.2;
+  }
+}
+
+.streak-calendar__day-num {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}

@@ -41,30 +41,29 @@
 .gesture-details-info { flex: 1; }
 
 .gesture-details-title {
-  font-size: 32px;
+  font-size: 2rem;
   margin: 0 0 5px 0;
   display: inline;
 }
 
 .gesture-details-synonyms {
   color: var(--color-text-muted);
-  font-size: 18px;
+  font-size: 1.125rem;
   margin-left: 10px;
 }
 
 .gesture-details-description {
   margin-top: 20px;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.5;
   max-width: 80%;
   color: var(--color-text-muted);
 }
 
 .gesture-details-illustration {
-  width: 150px;
-  height: 150px;
+  width: 220px;
   background-color: var(--color-surface-alt);
-  border-radius: 50%;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
@@ -76,8 +75,9 @@
 
   img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
+    display: block;
   }
 }
 
@@ -125,7 +125,7 @@
 
   h2 {
     text-align: center;
-    font-size: 28px;
+    font-size: 1.75rem;
     margin-bottom: 30px;
     color: var(--color-text);
   }

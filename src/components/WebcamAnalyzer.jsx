@@ -43,11 +43,13 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
         frameBuffer.current.push(currentFrameFeatures);
 
         // Коли назбирали вікно у 30 кадрів
+        if (frameBuffer.current.length > 30) {
+          frameBuffer.current.shift(); // Видаляємо 1 найстаріший кадр
+        }
+
+        // Робимо прогноз кожного разу, коли буфер заповнений
         if (frameBuffer.current.length === 30) {
-          // Відправляємо копію буфера на бекенд
           sendToPredict([...frameBuffer.current]);
-          // Зсуваємо вікно на 5 кадрів (можна на 1, але 5 зменшить навантаження)
-          frameBuffer.current = frameBuffer.current.slice(5); 
         }
       }
 

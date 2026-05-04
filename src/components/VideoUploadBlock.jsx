@@ -1,5 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 
+import { extractFeatures } from '../utils/feature_extractor';
+
+
 const MP = window.MP_VISION || {};
 const DrawingUtils = MP.DrawingUtils;
 const PoseLandmarker = MP.PoseLandmarker;
@@ -95,8 +98,7 @@ const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddS
 
         const rawVector = exportLandmarksToVector(poseResult.landmarks?.[0], handResult);
         
-        // ВИПРАВЛЕНО: Тільки ОДИН push і округлення до 4 знаків!
-        const vector = rawVector.map(num => Number(num.toFixed(6)));
+        const vector = extractFeatures(poseResult, handResult);
         framesBuffer.push(vector);
         
         setProgress(framesBuffer.length);

@@ -34,14 +34,14 @@ const GesturesPage = () => {
 
   return (
     <div className="gestures-page">
-      <div className="gestures-back-btn">
-        <button className="gestures-page__back" onClick={() => navigate(-1)} aria-label="Go back">
+      <div className="page-header">
+        <button className="page-header__back" onClick={() => navigate('/')} aria-label="Go back">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2>{t('back_to_dashboard')}</h2>
+        <h2 className="page-header__title">{t('library_of_gestures')}</h2>
       </div>
 
       {Object.keys(groupedGestures).map((category) => {
@@ -53,9 +53,21 @@ const GesturesPage = () => {
               onClick={() => toggleCategory(category)}
             >
               <h2 className="gesture-section__title">
-                <span className={`gesture-section__arrow ${isCollapsed ? 'rotated' : ''}`}>▼</span>
-                {category}
-              </h2>
+  <svg 
+    className={`gesture-section__arrow ${isCollapsed ? 'is-collapsed' : ''}`} 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.5" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+  <span className="gesture-section__title-text">{category}</span>
+</h2>
               <div className="gesture-section__divider" />
               <span className="gesture-section__count">
                 {groupedGestures[category].length} {t('gestures_count', { count: groupedGestures[category].length })}
