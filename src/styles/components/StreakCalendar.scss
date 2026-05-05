@@ -1,5 +1,5 @@
 .streak-calendar {
-  margin-bottom: 30px;
+  margin-bottom: 0;
 }
 
 /* ── navigation ── */
@@ -41,8 +41,8 @@
 /* ── day-of-week labels ── */
 .streak-calendar__header {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 32px));
+  gap: 3px;
   margin-bottom: 4px;
 }
 
@@ -56,8 +56,8 @@
 /* ── grid ── */
 .streak-calendar__grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 32px));
+  gap: 3px;
 }
 
 /* ── cells ── */
@@ -109,7 +109,7 @@
 }
 
 .streak-calendar__day-num {
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   color: var(--color-text-muted);
   line-height: 1;
   pointer-events: none;

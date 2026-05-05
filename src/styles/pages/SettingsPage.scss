@@ -12,8 +12,8 @@
   text-align: center;
   font-size: 0.875rem;
 
-  &.success { background-color: #d4edda; color: #155724; }
-  &.error   { background-color: #f8d7da; color: #721c24; }
+  &.success { background: rgba(34, 197, 94, 0.15); color: var(--color-success); }
+  &.error   { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
 }
 
 /* ===== MENU ITEMS ===== */
@@ -57,6 +57,46 @@
   }
 }
 
+/* ===== TOGGLE ===== */
+.settings-toggle {
+  display: inline-flex;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked ~ .settings-toggle__track {
+      background: var(--color-primary);
+      .settings-toggle__thumb { transform: translateX(20px); }
+    }
+  }
+
+  &__track {
+    width: 44px;
+    height: 24px;
+    background: var(--color-border);
+    border-radius: 12px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: background var(--transition);
+  }
+
+  &__thumb {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform var(--transition);
+    flex-shrink: 0;
+  }
+}
+
 /* ===== FORM ===== */
 .settings-form {
   display: flex;
@@ -91,6 +131,29 @@
   }
 }
 
+.settings-pw-wrap {
+  position: relative;
+
+  .settings-input { padding-right: 42px; }
+}
+
+.settings-pw-toggle {
+  position: absolute;
+  right: 10px;
+  top: 55%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition);
+
+  &:hover { color: var(--color-text); }
+}
+
 .settings-input--disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -99,10 +162,18 @@
   letter-spacing: 3px;
 }
 
-.change-password-btn {
-  margin-top: 10px;
-  font-size: 0.875rem;
-  padding: 9px 12px;
+.save-btn.change-password-btn {
+  width: auto;
+  padding: 0;
+  margin-top: 6px;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  align-self: flex-start;
+
+  &:hover { background: none; text-decoration: underline; }
 }
 
 /* ===== BUTTONS ===== */
@@ -142,16 +213,17 @@
 
 .sign-out-btn {
   margin-top: 40px;
-  width: 100px;
-  padding: 8px;
-  border-radius: 15px;
-  border: none;
-  background: var(--color-text-muted);
-  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
   cursor: pointer;
   font-family: inherit;
+  font-size: 0.875rem;
+  transition: background var(--transition);
 
-  &:hover { background: var(--color-text); }
+  &:hover { background: rgba(239, 68, 68, 0.1); }
 }
 
 /* ===== CAMERA PREVIEW ===== */

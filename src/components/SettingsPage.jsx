@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const Toggle = ({ checked, onChange }) => (
+  <label className="settings-toggle">
+    <input type="checkbox" checked={checked} onChange={onChange} />
+    <span className="settings-toggle__track">
+      <span className="settings-toggle__thumb" />
+    </span>
+  </label>
+);
+
+const EyeIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+const EyeOffIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import API_BASE_URL from "../config/api";
@@ -9,9 +30,12 @@ import '../styles/pages/SettingsPage.scss';
 
 const SettingsPage = ({ models }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('main');
+  const [activeTab, setActiveTab] = useState(location.state?.tab ?? 'main');
   const [showPreview, setShowPreview] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({ old: false, new: false, confirm: false });
+  const togglePw = (field) => setShowPasswords(p => ({ ...p, [field]: !p[field] }));
 
   const [profileData, setProfileData] = useState({ username: '', email: '' });
   const [passwordData, setPasswordData] = useState({ old_password: '', new_password: '', confirm_password: '' });
@@ -190,8 +214,7 @@ const SettingsPage = ({ models }) => {
 
           <div className="menu-item">
             {t('dark_mode')}
-            <input
-              type="checkbox"
+            <Toggle
               checked={uiSettings.theme === 'dark'}
               onChange={(e) => {
                 const newTheme = e.target.checked ? 'dark' : 'light';
@@ -216,8 +239,7 @@ const SettingsPage = ({ models }) => {
 
           <div className="menu-item">
             {t('email_subscription')}
-            <input
-              type="checkbox"
+            <Toggle
               checked={uiSettings.email_notifications}
               onChange={(e) => setUiSettings({ ...uiSettings, email_notifications: e.target.checked })}
             />
@@ -241,7 +263,7 @@ const SettingsPage = ({ models }) => {
 
           <label className="settings-label">{t('password')}</label>
           <input className="settings-input settings-input--disabled" type="password" value="••••••••" readOnly disabled />
-          <button className="save-btn secondary change-password-btn" onClick={() => setActiveTab('password')}>
+          <button className="save-btn change-password-btn" onClick={() => setActiveTab('password')}>
             {t('change_password')}
           </button>
 
@@ -253,9 +275,25 @@ const SettingsPage = ({ models }) => {
       {/* PASSWORD */}
       {activeTab === 'password' && (
         <div className="settings-form">
-          <input className="settings-input" type="password" placeholder={t('old_password')} value={passwordData.old_password} onChange={(e) => setPasswordData({ ...passwordData, old_password: e.target.value })} />
-          <input className="settings-input" type="password" placeholder={t('new_password')} value={passwordData.new_password} onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })} style={{ marginTop: '10px' }} />
-          <input className="settings-input" type="password" placeholder={t('confirm_password')} value={passwordData.confirm_password} onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })} style={{ marginTop: '10px' }} />
+          {[
+            { field: 'old',     placeholder: t('old_password'),     key: 'old_password' },
+            { field: 'new',     placeholder: t('new_password'),     key: 'new_password' },
+            { field: 'confirm', placeholder: t('confirm_password'), key: 'confirm_password' },
+          ].map(({ field, placeholder, key }) => (
+            <div key={field} className="settings-pw-wrap">
+              <input
+                className="settings-input"
+                type={showPasswords[field] ? 'text' : 'password'}
+                placeholder={placeholder}
+                value={passwordData[key]}
+                onChange={(e) => setPasswordData({ ...passwordData, [key]: e.target.value })}
+              />
+              <button type="button" className="settings-pw-toggle" onClick={() => togglePw(field)}
+                aria-label={showPasswords[field] ? 'Hide password' : 'Show password'}>
+                {showPasswords[field] ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
+          ))}
           <button className="save-btn" onClick={handleChangePassword}>{t('save_password')}</button>
         </div>
       )}
@@ -265,7 +303,7 @@ const SettingsPage = ({ models }) => {
         <div className="settings-form">
           <div className="menu-item">
             {t('skeleton_visibility')}
-            <input type="checkbox" checked={uiSettings.is_landmarks_visible} onChange={(e) => setUiSettings({ ...uiSettings, is_landmarks_visible: e.target.checked })} />
+            <Toggle checked={uiSettings.is_landmarks_visible} onChange={(e) => setUiSettings({ ...uiSettings, is_landmarks_visible: e.target.checked })} />
           </div>
           <div className="menu-item">
             {t('skeleton_color')}
@@ -273,7 +311,7 @@ const SettingsPage = ({ models }) => {
           </div>
           <div className="menu-item">
             {t('mirror_view')}
-            <input type="checkbox" checked={uiSettings.is_mirror_view} onChange={(e) => setUiSettings({ ...uiSettings, is_mirror_view: e.target.checked })} />
+            <Toggle checked={uiSettings.is_mirror_view} onChange={(e) => setUiSettings({ ...uiSettings, is_mirror_view: e.target.checked })} />
           </div>
 
           <button className="save-btn" onClick={handleUpdateUI}>{t('save_video')}</button>

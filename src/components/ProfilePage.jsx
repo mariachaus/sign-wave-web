@@ -8,6 +8,26 @@ import AchievementItem from './AchievementItem';
 import StreakCalendar from './StreakCalendar';
 import '../styles/pages/ProfilePage.scss';
 
+const BackIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+);
+
 const ProfilePage = () => {
   const { t } = useTranslation();
   const [profile, setProfile] = useState(null);
@@ -22,7 +42,6 @@ const ProfilePage = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) { navigate('/auth'); return; }
-
         const res = await axios.get(`${API_BASE_URL}/api/user/profile`, {
           params: { user_id: userId },
           headers: { Authorization: `Bearer ${token}` }
@@ -41,18 +60,14 @@ const ProfilePage = () => {
     fetchProfile();
   }, [navigate, userId]);
 
-  if (loading) return (
-    <div className="profile-state">{t('profile_loading')}</div>
-  );
+  if (loading) return <div className="profile-state">{t('profile_loading')}</div>;
 
   if (!profile) return (
     <div className="profile-state">
       <h2>{t('user_not_found')}</h2>
       <p>{t('session_error')}</p>
-      <button
-        className="btn-primary"
-        onClick={() => { localStorage.removeItem('token'); navigate('/auth'); }}
-      >
+      <button className="profile-state__btn"
+        onClick={() => { localStorage.removeItem('token'); navigate('/auth'); }}>
         {t('go_to_login')}
       </button>
     </div>
@@ -60,72 +75,95 @@ const ProfilePage = () => {
 
   const avatarImage = profile.avatar_url || defaultAvatar;
 
+  const stats = [
+    { icon: '🔥', value: profile.current_streak, unit: t('days_count'), label: t('current_streak') },
+    { icon: '⚡', value: profile.longest_streak,  unit: t('days_count'), label: t('longest_streak') },
+    { icon: '✋', value: profile.stats?.signs_learned ?? 0, label: t('signs_learned') },
+    { icon: '⭐', value: profile.total_xp,                  label: t('xp_earned') },
+  ];
+
+  const allAchievements      = profile.achievements ?? [];
+  const earnedAchievements   = allAchievements.filter(a => a.earned !== false);
+  const unearnedAchievements = allAchievements.filter(a => a.earned === false);
+
   return (
     <div className="profile-page">
-      <div className="page-header">
-        <button className="page-header__back" onClick={() => navigate('/')} aria-label="Go back">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5" />
-            <path d="M12 19l-7-7 7-7" />
-          </svg>
+
+      {/* ── Page header ── */}
+      <div className="profile-topbar">
+        <button className="profile-topbar__back" onClick={() => navigate('/')} aria-label="Go back">
+          <BackIcon />
         </button>
-        <h2 className="page-header__title">{t('profile')}</h2>
+        <h1 className="profile-topbar__title">{t('profile')}</h1>
+        <button className="profile-topbar__settings" onClick={() => navigate('/settings')} aria-label="Settings">
+          <SettingsIcon />
+        </button>
       </div>
 
-      <div className="profile-header">
-        <div className="avatar-wrapper">
-          <img
-            src={avatarImage}
-            alt="User Avatar"
-            onError={(e) => { e.target.src = defaultAvatar; }}
-          />
+      {/* ── User card ── */}
+      <div className="profile-user-card">
+        <div className="profile-user-card__avatar">
+          <img src={avatarImage} alt="avatar" onError={e => { e.target.src = defaultAvatar; }} />
         </div>
-        <div className="profile-info">
-          <h2>{profile.username}</h2>
-          <p>{t('joined')} {profile.joined_at}</p>
+        <div className="profile-user-card__info">
+          <h2 className="profile-user-card__name">{profile.username}</h2>
+          <p className="profile-user-card__joined">{t('joined')} {profile.joined_at}</p>
         </div>
-        <div className="settings-icon" onClick={() => navigate('/settings')}>⚙️</div>
+        <button className="profile-edit-btn" onClick={() => navigate('/settings', { state: { tab: 'personal' } })}>
+          <EditIcon /> {t('edit') || 'Edit'}
+        </button>
       </div>
 
-      <div className="streak-grid">
-        <div className="stat-card">
-          <div className="stat-card__value">{profile.current_streak} {t('days_count')}</div>
-          <div className="stat-card__label">{t('current_streak')}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-card__value">{profile.longest_streak} {t('days_count')}</div>
-          <div className="stat-card__label">{t('longest_streak')}</div>
-        </div>
-      </div>
-
-      <StreakCalendar />
-
-      <h3 className="section-title">{t('stats')}</h3>
-      <div className="stats-grid">
-        {[
-          { label: t('errors_made'),     value: profile.stats.errors_made },
-          { label: t('errors_corrected'), value: profile.stats.errors_corrected },
-          { label: t('xp_earned'),       value: profile.total_xp },
-          { label: t('signs_learned'),   value: profile.stats.signs_learned },
-        ].map((stat, i) => (
-          <div key={i} className="stat-box">
-            <div className="stat-box__value">{stat.value}</div>
-            <div className="stat-box__label">{stat.label}</div>
+      {/* ── Stats 2×2 ── */}
+      <div className="profile-stats-grid">
+        {stats.map((s, i) => (
+          <div key={i} className="profile-stat-card">
+            <div className="profile-stat-card__icon">{s.icon}</div>
+            <div className="profile-stat-card__value">
+              {s.value}{s.unit ? <span className="profile-stat-card__unit"> {s.unit}</span> : null}
+            </div>
+            <div className="profile-stat-card__label">{s.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="achievements-header">
-        <h3>{t('achievements')}</h3>
-        <span className="view-all-link" onClick={() => navigate('/achievements')}>{t('view_all')}</span>
+      {/* ── Streak Calendar ── */}
+      <h3 className="profile-section-title">{t('streak_calendar') || 'Streak Calendar'}</h3>
+      <div className="profile-calendar-card">
+        <StreakCalendar />
       </div>
 
-      <div className="badges-row">
-        {profile.achievements?.length > 0
-          ? profile.achievements.map((ach) => <AchievementItem key={ach.id} achievement={ach} />)
-          : <p className="empty-state">{t('no_achievements')}</p>
-        }
+      {/* ── Achievements ── */}
+      <div className="profile-achievements-header">
+        <h3 className="profile-section-title" style={{ margin: 0 }}>{t('achievements')}</h3>
+        <button className="profile-view-all" onClick={() => navigate('/achievements')}>
+          {t('view_all')}
+        </button>
       </div>
+
+      {earnedAchievements.length > 0 ? (
+        <div className="profile-badges-scroll">
+          {earnedAchievements.map(ach => (
+            <div key={ach.id} className="profile-badge-card">
+              <AchievementItem achievement={ach} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="profile-empty">{t('no_achievements')}</p>
+      )}
+
+      {unearnedAchievements.length > 0 && (
+        <div className="profile-locked-list">
+          {unearnedAchievements.map(ach => (
+            <div key={ach.id} className="profile-locked-item">
+              <AchievementItem achievement={ach} />
+              <span className="profile-locked-chip">{t('locked_achievements')}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 };

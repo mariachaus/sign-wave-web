@@ -10,6 +10,8 @@ i18n
           // Auth
           "sign_in": "Sign In",
           "create_account": "Create Account",
+          "sign_in_sub": "Sign in to continue learning",
+          "sign_up_sub": "Start your sign language journey",
           "username": "Username",
           "email": "Email",
           "email_address": "Email Address",
@@ -84,6 +86,8 @@ i18n
           "locked_achievements": "Locked",
           "earned": "Earned",
           "profile" : "Profile",
+          "streak_calendar": "Streak Calendar",
+          "edit": "Edit",
 
           // Gestures
           "library_of_gestures": "Gesture Library",
@@ -218,6 +222,8 @@ i18n
           // Auth
           "sign_in": "Увійти",
           "create_account": "Створити акаунт",
+          "sign_in_sub": "Увійдіть, щоб продовжити навчання",
+          "sign_up_sub": "Почніть своє знайомство з жестовою мовою",
           "username": "Ім'я користувача",
           "email": "Електронна пошта",
           "email_address": "Електронна пошта",
@@ -292,13 +298,15 @@ i18n
           "locked_achievements": "Заблоковано",
           "earned": "Отримано",
           "profile": "Профіль",
+          "streak_calendar": "Календар серій",
+          "edit": "Редагувати",
 
           // Gestures
           "library_of_gestures": "Бібліотека жестів",
           "other": "Інше",
           "gestures_count": "жестів",
           "no_description": "Опис відсутній.",
-          "practice_now": "Вправлятися зараз",
+          "practice_now": "Практикувати зараз",
           "similar_gestures": "Схожі жести",
 
           // Learn / Levels
@@ -315,7 +323,7 @@ i18n
           "back_to_lessons": "До уроків",
           "exit_lesson": "Вийти з уроку",
           "exit_lesson_confirm": "Вийти з уроку? Прогрес буде втрачено, і наступного разу вправи будуть іншими.",
-          "practice_complete": "Вправляння завершено!",
+          "practice_complete": "Практику завершено!",
           "lesson_failed": "Урок провалено!",
           "hearts_run_out": "Серця закінчились. Спробуйте ще раз!",
 
