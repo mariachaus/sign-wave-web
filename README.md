@@ -1,16 +1,100 @@
-# React + Vite
+# SignWave — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for SignWave, an interactive sign language learning application with real-time gesture recognition.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** — UI
+- **Vite 8** — build tool with HTTPS support (`@vitejs/plugin-basic-ssl`)
+- **React Router v7** — client-side routing
+- **SCSS** — component and page styles
+- **Tailwind CSS** — utility classes
+- **i18next** — Ukrainian / English localisation
+- **Axios** — HTTP client
+- **MediaPipe** (`@mediapipe/tasks-vision`) — real-time hand gesture recognition
 
-## React Compiler
+## Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+├── components/
+│   ├── exercises/          # Lesson exercise types
+│   │   ├── LessonController.jsx
+│   │   ├── TheorySlide.jsx
+│   │   ├── QuizExercise.jsx
+│   │   ├── MatchingExercise.jsx
+│   │   ├── RecallExercise.jsx
+│   │   └── ImitationExercise.jsx
+│   ├── AuthPage.jsx
+│   ├── MainDashboard.jsx
+│   ├── LevelsPage.jsx
+│   ├── LessonPage.jsx
+│   ├── PracticePage.jsx
+│   ├── GesturesPage.jsx
+│   ├── GestureDetailsPage.jsx
+│   ├── AchievementsPage.jsx
+│   ├── AchievementPopup.jsx
+│   ├── ProfilePage.jsx
+│   ├── SettingsPage.jsx
+│   ├── AdminPage.jsx
+│   ├── WebcamAnalyzer.jsx
+│   └── StreakCalendar.jsx
+├── styles/
+│   ├── global.scss
+│   ├── components/
+│   └── pages/
+├── config/
+│   └── api.js              # API base URL
+├── i18n.js                 # i18next setup
+└── App.jsx
+```
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js 18+
+- Backend running (see `../backend/`)
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run development server
+
+```bash
+npm run dev
+```
+
+The app runs on `https://localhost:5173` (HTTPS is required for camera access).
+
+### Run on a physical device (same Wi-Fi network)
+
+```bash
+npm run dev -- --host
+```
+
+Then open `https://<your-computer-ip>:5173` on the device. Accept the self-signed certificate warning to enable camera access.
+
+## Features
+
+- **Lessons** — structured levels with theory, quiz, matching, recall, and imitation exercises
+- **Practice** — gesture-specific practice sessions with real-time camera recognition
+- **Streak system** — daily activity tracking with freeze shields
+- **Achievements** — 19 achievements awarded automatically on lesson/practice completion
+- **Daily tasks** — randomly generated tasks with XP rewards
+- **Profile** — stats, streak calendar, earned achievements
+- **Settings** — theme, language, font size, camera options
+- **Admin panel** — user and gesture management
+
+## Environment
+
+The API base URL is configured in `src/config/api.js`. Update it to point to your backend instance.
+
+## Build
+
+```bash
+npm run build
+```
