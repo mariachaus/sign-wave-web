@@ -21,7 +21,7 @@ import axios from 'axios';
 import './styles/global.scss';
 
 function App() {
-  const { i18n } = useTranslation(); // Отримуємо об'єкт керування мовою
+  const { t, i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [models, setModels] = useState({ image: { pose: null, hand: null }, video: { pose: null, hand: null } });
   const [isLoaded, setIsLoaded] = useState(false);
@@ -127,7 +127,7 @@ function App() {
                   Admin
                 </button>
               )}
-              <button className="app-header__logout" onClick={handleLogout}>Log out</button>
+              <button className="app-header__logout" onClick={handleLogout}>{t('log_out')}</button>
             </div>
           </header>
         )}

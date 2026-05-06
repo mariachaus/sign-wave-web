@@ -70,50 +70,51 @@ const MainDashboard = ({ models }) => {
   };
 
   return (
-    <>
-      <nav className="main-nav">
-        <button
-          className={`nav-tab ${tab === 'image' ? 'active' : ''}`}
-          onClick={() => setTab('image')}
-        >
-          🖼️ {t('tab_image')}
-        </button>
-        <button
-          className={`nav-tab ${tab === 'webcam' ? 'active' : ''}`}
-          onClick={() => setTab('webcam')}
-        >
-          🎥 {t('tab_webcam')}
-        </button>
-        <button
-          className={`nav-tab ${tab === 'videoData' ? 'active' : ''}`}
-          onClick={() => setTab('videoData')}
-        >
-          🎬 {t('tab_video_data')}
-        </button>
-        <button
-          className="nav-tab"
-          onClick={() => navigate('/gestures')}
-        >
-          📖 {t('library_of_gestures')}
-        </button>
+    <div className="dashboard-page">
+      <aside className="dashboard-sidebar">
+        <nav className="dashboard-sidebar__nav">
 
-        <button
-          className="nav-tab"
-          onClick={() => navigate('/learn')}
-        >
-          🎓 {t('learn')}
-        </button>
+          <span className="dashboard-sidebar__label">{t('tab_image') && 'ML Tools'}</span>
+          <button className={`dashboard-nav-item${tab === 'image' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('image')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            {t('tab_image')}
+          </button>
+          <button className={`dashboard-nav-item${tab === 'webcam' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('webcam')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            {t('tab_webcam')}
+          </button>
+          <button className={`dashboard-nav-item${tab === 'videoData' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('videoData')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><polygon points="10 11 8 13 10 15 10 11"/><line x1="16" y1="13" x2="12" y2="13"/></svg>
+            {t('tab_video_data')}
+          </button>
 
-        
+          <div className="dashboard-sidebar__divider" />
 
-        <button
-          className="nav-profile-btn"
-          onClick={() => navigate('/profile')}
-        >
-          👤 {t('my_profile')}
-        </button>
-      </nav>
+          <span className="dashboard-sidebar__label">{t('learn')}</span>
+          <button className="dashboard-nav-item" onClick={() => navigate('/learn')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            {t('learn')}
+          </button>
+          <button className="dashboard-nav-item" onClick={() => navigate('/gestures')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            {t('library_of_gestures')}
+          </button>
 
+          <div className="dashboard-sidebar__bottom">
+            <button className="dashboard-nav-item" onClick={() => navigate('/profile')}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              {t('my_profile')}
+            </button>
+            <button className="dashboard-nav-item" onClick={() => navigate('/settings')}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              {t('settings')}
+            </button>
+          </div>
+
+        </nav>
+      </aside>
+
+      <main className="dashboard-main">
       <div className="dashboard-widgets">
 
         {/* Stats row */}
@@ -203,7 +204,7 @@ const MainDashboard = ({ models }) => {
               <div className="widget-god__info">
                 <div className="widget-god__name">{dailyGesture.name}</div>
                 <button className="widget-god__btn" onClick={() => navigate(`/gestures/${dailyGesture.id}`)}>
-                  {t('view_details')} →
+                  {t('view_details')}
                 </button>
               </div>
             </div>
@@ -249,7 +250,8 @@ const MainDashboard = ({ models }) => {
           </div>
         )}
       </section>
-    </>
+      </main>
+    </div>
   );
 };
 

@@ -75,7 +75,11 @@ const LevelsPage = () => {
         </button>
         <h2 className="page-header__title">{t('learn')}</h2>
         <button className="page-header__action" onClick={() => navigate('/flashcards')}>
-          🗂️ {t('flashcards')}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="6" width="20" height="14" rx="2"/>
+            <path d="M16 2H8a2 2 0 0 0-2 2v2h12V4a2 2 0 0 0-2-2z"/>
+          </svg>
+          {t('flashcards')}
         </button>
       </div>
 

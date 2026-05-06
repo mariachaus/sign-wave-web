@@ -9,14 +9,24 @@ const GesturesPage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [gestures, setGestures] = useState([]);
+  const [categoryDescriptions, setCategoryDescriptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [collapsedCategories, setCollapsedCategories] = useState({});
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/gestures?lang=${i18n.language}`)
-      .then((res) => res.json())
-      .then((data) => { setGestures(data); setLoading(false); })
+    const lang = i18n.language;
+    Promise.all([
+      fetch(`${API_BASE_URL}/api/gestures?lang=${lang}`).then(r => r.json()),
+      fetch(`${API_BASE_URL}/api/gestures/categories?lang=${lang}`).then(r => r.json()),
+    ])
+      .then(([gesturesData, categoriesData]) => {
+        setGestures(gesturesData);
+        const descMap = {};
+        categoriesData.forEach(c => { if (c.description) descMap[c.name] = c.description; });
+        setCategoryDescriptions(descMap);
+        setLoading(false);
+      })
       .catch((err) => { console.error("Error fetching gestures:", err); setLoading(false); });
   }, [i18n.language]);
 
@@ -75,11 +85,16 @@ const GesturesPage = () => {
             </div>
 
             {!isCollapsed && (
-              <div className="gesture-section__grid">
-                {groupedGestures[category].map((gesture) => (
-                  <GestureCard key={gesture.id} gesture={gesture} />
-                ))}
-              </div>
+              <>
+                {categoryDescriptions[category] && (
+                  <p className="gesture-section__description">{categoryDescriptions[category]}</p>
+                )}
+                <div className="gesture-section__grid">
+                  {groupedGestures[category].map((gesture) => (
+                    <GestureCard key={gesture.id} gesture={gesture} />
+                  ))}
+                </div>
+              </>
             )}
           </section>
         );

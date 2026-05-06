@@ -201,7 +201,6 @@ const FlashcardsPage = () => {
           </svg>
         </button>
         <div className="flashcards-landing">
-          <div className="flashcards-landing__icon">🗂️</div>
           <h2 className="flashcards-landing__title">{t('flashcards')}</h2>
           <div className="flashcards-landing__stats">
             <div className="flashcards-landing__stat">

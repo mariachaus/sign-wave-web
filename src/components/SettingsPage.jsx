@@ -178,7 +178,7 @@ const SettingsPage = ({ models }) => {
 
   const handleBack = () => {
     if (showPreview) { setShowPreview(false); return; }
-    activeTab === 'main' ? navigate('/profile') : setActiveTab('main');
+    activeTab === 'main' ? navigate(-1) : setActiveTab('main');
   };
 
   const pageTitle = showPreview
@@ -250,9 +250,6 @@ const SettingsPage = ({ models }) => {
           </div>
 
           <button className="save-btn primary" onClick={handleUpdateUI}>{t('save_general')}</button>
-          <button className="sign-out-btn" onClick={() => { localStorage.clear(); window.location.href = '/auth'; }}>
-            {t('sign_out')}
-          </button>
         </div>
       )}
 
