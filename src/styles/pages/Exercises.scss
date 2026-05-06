@@ -61,12 +61,13 @@
 }
 
 .lesson-ctrl__heart {
-  font-size: 1.125rem;
-  line-height: 1;
-  color: var(--color-border);
-  transition: color var(--transition);
+  width: 22px;
+  height: 22px;
+  fill: var(--color-border);
+  transition: fill var(--transition);
+  flex-shrink: 0;
 
-  &--active { color: #e53e3e; }
+  &--active { fill: #e53e3e; }
 }
 
 .lesson-ctrl__step-label {

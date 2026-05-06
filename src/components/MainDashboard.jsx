@@ -104,6 +104,8 @@ const MainDashboard = ({ models }) => {
           🎓 {t('learn')}
         </button>
 
+        
+
         <button
           className="nav-profile-btn"
           onClick={() => navigate('/profile')}

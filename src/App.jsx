@@ -13,6 +13,7 @@ import LessonPage from './components/LessonPage';
 import PracticePage from './components/PracticePage';
 import AchievementsPage from './components/AchievementsPage';
 import AdminPage from './components/AdminPage';
+import FlashcardsPage from './components/FlashcardsPage';
 import API_BASE_URL from "./config/api";
 import { applyTheme, applyFontSize } from './utils/theme';
 
@@ -58,6 +59,7 @@ function App() {
           const ui = res.data.ui;
           // Записуємо все у локальне сховище
           localStorage.setItem('skeleton_color', ui.landmark_color);
+          if (ui.connection_color) localStorage.setItem('connection_color', ui.connection_color);
           localStorage.setItem('is_landmarks_visible', ui.is_landmarks_visible);
           localStorage.setItem('mirror_view', ui.is_mirror_view_enabled);
           localStorage.setItem('font_size', ui.font_size);
@@ -143,6 +145,7 @@ function App() {
           <Route path="/lesson/:id" element={<PrivateRoute><LessonPage models={models} /></PrivateRoute>} />
           <Route path="/practice/:gestureId" element={<PrivateRoute><PracticePage models={models} /></PrivateRoute>} />
           <Route path="/achievements" element={<PrivateRoute><AchievementsPage /></PrivateRoute>} />
+          <Route path="/flashcards" element={<PrivateRoute><FlashcardsPage /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
           
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />

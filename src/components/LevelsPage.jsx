@@ -74,6 +74,9 @@ const LevelsPage = () => {
           <BackIcon />
         </button>
         <h2 className="page-header__title">{t('learn')}</h2>
+        <button className="page-header__action" onClick={() => navigate('/flashcards')}>
+          🗂️ {t('flashcards')}
+        </button>
       </div>
 
       {levels.length > 0 && (

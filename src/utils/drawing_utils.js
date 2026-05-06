@@ -15,6 +15,7 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
     const isVisible = rawVisible === null ? true : rawVisible === 'true';
     
     const skeletonColor = localStorage.getItem('skeleton_color') || '#00FF00';
+    const connectionColor = localStorage.getItem('connection_color') || '#FF0000';
 
     // 1. СИНХРОНІЗАЦІЯ (SNAP) - вона має працювати завжди для логіки, 
     // навіть якщо ми не бачимо результат, щоб координати оновлювалися
@@ -58,7 +59,7 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
             });
             drawingUtils.drawLandmarks(landmark, {
                 radius: (data) => (hiddenPoseIds.includes(data.index) ? 0 : 2),
-                color: '#FF0000'
+                color: connectionColor
             });
         });
     }
@@ -70,9 +71,9 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
                 color: skeletonColor, 
                 lineWidth: 5 
             });
-            drawingUtils.drawLandmarks(landmarks, { 
-                color: "#FF0000", 
-                lineWidth: 2 
+            drawingUtils.drawLandmarks(landmarks, {
+                color: connectionColor,
+                lineWidth: 2
             });
         });
     }

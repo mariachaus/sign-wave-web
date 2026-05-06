@@ -47,6 +47,7 @@ const SettingsPage = ({ models }) => {
     email_notifications: true,
     is_landmarks_visible: localStorage.getItem('is_landmarks_visible') !== 'false',
     landmark_color: localStorage.getItem('skeleton_color') || '#00FF00',
+    connection_color: localStorage.getItem('connection_color') || '#FF0000',
     is_mirror_view: localStorage.getItem('mirror_view') !== 'false',
   });
 
@@ -71,6 +72,7 @@ const SettingsPage = ({ models }) => {
             email_notifications: ui.email_notifications,
             is_landmarks_visible: ui.is_landmarks_visible,
             landmark_color: ui.landmark_color,
+            connection_color: ui.connection_color || '#FF0000',
             is_mirror_view: ui.is_mirror_view_enabled,
           });
           syncLocalData(ui);
@@ -85,6 +87,7 @@ const SettingsPage = ({ models }) => {
 
   const syncLocalData = (ui) => {
     localStorage.setItem('skeleton_color', ui.landmark_color);
+    if (ui.connection_color) localStorage.setItem('connection_color', ui.connection_color);
     localStorage.setItem('is_landmarks_visible', ui.is_landmarks_visible);
     localStorage.setItem('mirror_view', ui.is_mirror_view_enabled ?? ui.is_mirror_view);
     localStorage.setItem('font_size', ui.font_size);
@@ -104,6 +107,7 @@ const SettingsPage = ({ models }) => {
         theme: uiSettings.theme,
         language: uiSettings.language,
         landmark_color: uiSettings.landmark_color,
+        connection_color: uiSettings.connection_color,
         is_landmarks_visible: uiSettings.is_landmarks_visible,
         font_size: uiSettings.font_size,
         email_notifications: uiSettings.email_notifications,
@@ -308,6 +312,10 @@ const SettingsPage = ({ models }) => {
           <div className="menu-item">
             {t('skeleton_color')}
             <input type="color" value={uiSettings.landmark_color} onChange={(e) => setUiSettings({ ...uiSettings, landmark_color: e.target.value })} />
+          </div>
+          <div className="menu-item">
+            {t('connection_color')}
+            <input type="color" value={uiSettings.connection_color} onChange={(e) => setUiSettings({ ...uiSettings, connection_color: e.target.value })} />
           </div>
           <div className="menu-item">
             {t('mirror_view')}

@@ -15,12 +15,13 @@ const PracticePage = ({ models }) => {
   const [practiceKey, setPracticeKey] = useState(0);
   const [newAchievements, setNewAchievements] = useState([]);
 
-  const handleComplete = async () => {
+  const handleComplete = async (_lessonId, _hearts, errors = []) => {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_BASE_URL}/api/lessons/practice/${gestureId}/complete`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ errors }),
       });
       const data = await res.json();
       if (data.new_achievements?.length > 0) {
