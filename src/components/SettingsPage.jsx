@@ -250,6 +250,10 @@ const SettingsPage = ({ models }) => {
           </div>
 
           <button className="save-btn primary" onClick={handleUpdateUI}>{t('save_general')}</button>
+
+          <div className="menu-item" onClick={() => navigate('/terms')} style={{ marginTop: 8 }}>
+            {t('terms_of_use') || 'Terms of Use'} <span>➜</span>
+          </div>
         </div>
       )}
 

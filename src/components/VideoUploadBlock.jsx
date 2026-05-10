@@ -95,8 +95,6 @@ const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddS
           drawingUtils, poseResult, handResult, 
           PoseLandmarker.POSE_CONNECTIONS, HandLandmarker.HAND_CONNECTIONS
         );
-
-        const rawVector = exportLandmarksToVector(poseResult.landmarks?.[0], handResult);
         
         const vector = extractFeatures(poseResult, handResult);
         framesBuffer.push(vector);

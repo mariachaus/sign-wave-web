@@ -13,6 +13,7 @@ import LessonPage from './components/LessonPage';
 import PracticePage from './components/PracticePage';
 import AchievementsPage from './components/AchievementsPage';
 import AdminPage from './components/AdminPage';
+import TermsPage from './components/TermsPage';
 import FlashcardsPage from './components/FlashcardsPage';
 import API_BASE_URL from "./config/api";
 import { applyTheme, applyFontSize } from './utils/theme';
@@ -148,6 +149,7 @@ function App() {
           <Route path="/flashcards" element={<PrivateRoute><FlashcardsPage /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
           
+          <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>
       </div>

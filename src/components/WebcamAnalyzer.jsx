@@ -18,8 +18,17 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
   const [prediction, setPrediction] = useState({ label: '', confidence: 0 });
 
   // ML Refs
-  const frameBuffer = useRef([]); 
+  const frameBuffer = useRef([]);
   const isPredicting = useRef(false);
+  const predictionHistory = useRef([]);
+
+  const computeDeltaFeatures = (buffer) =>
+    buffer.map((frame, i) => {
+      const delta = i === 0
+        ? new Array(225).fill(0)
+        : frame.map((v, j) => v - buffer[i - 1][j]);
+      return [...frame, ...delta];
+    });
 
   // Оновлена функція аналізу
   const predictWebcam = async () => {
@@ -37,22 +46,42 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
       const handResult = handModel.detectForVideo(video, startTimeMs);
       const poseResult = await new Promise(resolve => poseModel.detectForVideo(video, startTimeMs, resolve));
 
+     const isPersonVisible = (poseResult?.landmarks && poseResult.landmarks.length > 0) || 
+                       (handResult?.landmarks && handResult.landmarks.length > 0);
+
       // 2. ML ЛОГІКА: Збираємо фічі, якщо не йде активний запит
+
+      console.log("Visible:", isPersonVisible, "Buffer:", frameBuffer.current.length);
+      
       if (!isPredicting.current) {
+    if (!isPersonVisible) {
+        // ЛЮДИНИ НЕМАЄ: очищуємо і показуємо статус
+        frameBuffer.current = [];
+        setPrediction({ label: 'No data', confidence: 0 });
+    } else {
+        // ЛЮДИНА В КАДРІ: збираємо дані
         const currentFrameFeatures = extractFeatures(poseResult, handResult);
         frameBuffer.current.push(currentFrameFeatures);
 
-        // Коли назбирали вікно у 30 кадрів
+        // Тримаємо буфер у межах 30 кадрів (sliding window)
         if (frameBuffer.current.length > 30) {
-          frameBuffer.current.shift(); // Видаляємо 1 найстаріший кадр
+            frameBuffer.current.shift();
         }
 
-        // Робимо прогноз кожного разу, коли буфер заповнений
+        // ВІДПРАВЛЯЄМО НА ПЕРЕВІРКУ КОЛИ БУФЕР ПОВНИЙ
         if (frameBuffer.current.length === 30) {
-          sendToPredict([...frameBuffer.current]);
+            sendToPredict(computeDeltaFeatures([...frameBuffer.current]));
+        } else {
+            // Поки буфер заповнюється (від 1 до 29 кадру), 
+            // показуємо користувачеві, що йде процес аналізу
+            setPrediction(prev => ({ 
+                label: prev.label === '' || prev.label === 'No data' ? 'Analyzing...' : prev.label, 
+                confidence: prev.confidence 
+            }));
         }
-      }
-
+    }
+}
+      
       // 3. Малювання скелета
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawAllLandmarks(
@@ -76,22 +105,23 @@ const sendToPredict = async (features) => {
       body: JSON.stringify({ features: features })
     });
     const result = await response.json();
-    
-    // 1. Оновлюємо стан тільки якщо нейронка хоч трохи впевнена (>30%)
-    // Це прибере "стрибки" тексту на порожньому місці
+
     if (result.confidence > 0.3) {
-      setPrediction({ 
-        label: result.label, 
-        confidence: result.confidence 
+      predictionHistory.current.push({ label: result.label, confidence: result.confidence });
+      if (predictionHistory.current.length > 5) predictionHistory.current.shift();
+
+      const scores = {};
+      predictionHistory.current.forEach(({ label, confidence }) => {
+        scores[label] = (scores[label] || 0) + confidence;
       });
+      const smoothedLabel = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+      const smoothedConf = scores[smoothedLabel] / predictionHistory.current.length;
+
+      setPrediction({ label: smoothedLabel, confidence: smoothedConf });
     }
 
-    // 2. Якщо жест розпізнано чітко
     if (result.confidence > 0.8) {
       if (onGestureDetected) onGestureDetected(result.label);
-      
-      // Фіксуємо результат на 3 секунди, щоб користувач встиг побачити успіх
-      // Протягом цих 3 секунд нові передбачення не будуть заважати (якщо додати прапорець)
     }
   } catch (e) {
     console.error("ML Server Error:", e);
@@ -119,6 +149,7 @@ const sendToPredict = async (features) => {
 
       // 4. Скидаємо передбачення (тираємо текст)
       setPrediction({ label: '', confidence: 0 });
+      predictionHistory.current = [];
 
       // 5. Очищуємо буфер кадрів
       frameBuffer.current = []; 

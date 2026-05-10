@@ -1,6 +1,6 @@
-# SignWave — Frontend
+# Sign Wave — Frontend
 
-React + Vite frontend for SignWave, an interactive sign language learning application with real-time gesture recognition.
+React + Vite frontend for Sign Wave, an interactive **Ukrainian Sign Language (УЖМ)** learning application with real-time gesture recognition.
 
 ## Tech Stack
 
@@ -11,7 +11,7 @@ React + Vite frontend for SignWave, an interactive sign language learning applic
 - **Tailwind CSS** — utility classes
 - **i18next** — Ukrainian / English localisation
 - **Axios** — HTTP client
-- **MediaPipe** (`@mediapipe/tasks-vision`) — real-time hand gesture recognition
+- **MediaPipe** (`@mediapipe/tasks-vision`) — real-time pose & hand landmark detection (WASM, runs in browser)
 
 ## Project Structure
 
@@ -32,6 +32,7 @@ src/
 │   ├── PracticePage.jsx
 │   ├── GesturesPage.jsx
 │   ├── GestureDetailsPage.jsx
+│   ├── FlashcardsPage.jsx
 │   ├── AchievementsPage.jsx
 │   ├── AchievementPopup.jsx
 │   ├── ProfilePage.jsx
