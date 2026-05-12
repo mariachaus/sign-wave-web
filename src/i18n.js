@@ -258,7 +258,7 @@ i18n
           "continue_with_google": "Увійти через Google",
           "or": "або",
           "agree_to": "Я погоджуюся з",
-          "terms_of_use": "Умовами використання",
+          "terms_of_use": "Умови використання",
           "back": "Назад",
           "back_to_registration": "Назад до реєстрації",
           
