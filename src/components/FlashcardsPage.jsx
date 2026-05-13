@@ -183,7 +183,8 @@ const FlashcardsPage = () => {
           <button className="flashcards-done__btn" onClick={() => handleRestart(originalCards.current)}>
             {t('flashcards_restart_set')}
           </button>
-          <button className="flashcards-done__btn flashcards-done__btn--secondary" onClick={() => setStarted(false)}>
+          
+          <button className="flashcards-done__btn flashcards-done__btn--secondary" onClick={() => navigate('/')}>
             {t('back_to_dashboard')}
           </button>
         </div>
@@ -195,13 +196,15 @@ const FlashcardsPage = () => {
   if (!started) {
     return (
       <div className="flashcards-page">
-        <button className="flashcards-header__back" onClick={() => navigate(-1)}>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
-          </svg>
-        </button>
+        <div className="page-header">
+          <button className="page-header__back" onClick={() => navigate(-1)}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <h2 className="page-header__title">{t('flashcards')}</h2>
+        </div>
         <div className="flashcards-landing">
-          <h2 className="flashcards-landing__title">{t('flashcards')}</h2>
           <div className="flashcards-landing__stats">
             <div className="flashcards-landing__stat">
               <span className="flashcards-landing__stat-value">{cards.length}</span>

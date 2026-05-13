@@ -1,15 +1,13 @@
-// --- 1. ПІДГОТОВКА ВЕКТОРА (Математика не змінилася) ---
 export function exportLandmarksToVector(poseLandmarks, handResult) {
     const features = [];
     
-    // POSE (33 точки * 3 координати = 99 значень)
+
     if (poseLandmarks && poseLandmarks.length > 0) {
         poseLandmarks.forEach(lm => features.push(lm.x, lm.y, lm.z));
     } else {
         for (let i = 0; i < 99; i++) features.push(0);
     }
 
-    // HANDS (21 точка * 3 координати * 2 руки = 126 значень)
     let leftHandData = new Array(63).fill(0);
     let rightHandData = new Array(63).fill(0);
 
@@ -25,16 +23,16 @@ export function exportLandmarksToVector(poseLandmarks, handResult) {
         }
     }
     
-    // Разом: 99 + 126 = 225 ознак
+
     return features.concat(leftHandData).concat(rightHandData);
 }
 
-// --- 2. КОНВЕРТАЦІЯ В CSV (Чиста функція) ---
+
 export function convertToCSV(dataset) {
     if (!dataset || dataset.length === 0) return "";
     
     let str = 'label';
-    // Створюємо заголовки pixel_0...pixel_224
+
     for (let i = 0; i < 225; i++) str += `,pixel_${i}`;
     str += '\r\n';
 
@@ -48,10 +46,10 @@ export function convertToCSV(dataset) {
     return str;
 }
 
-// --- 3. ФУНКЦІЯ СКАЧУВАННЯ ---
+
 export function downloadCSVDataset(dataset) {
     if (dataset.length === 0) {
-        alert("Таблиця порожня!");
+        alert("Table is empty!");
         return;
     }
 

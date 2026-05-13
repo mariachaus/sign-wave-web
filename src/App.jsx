@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // Імпортуємо хук для зміни мови
 
 import AuthPage from './components/AuthPage';
@@ -113,29 +113,35 @@ function App() {
     return children;
   };
 
+  const AppHeader = () => {
+    const location = useLocation();
+    if (!token || location.pathname === '/terms') return null;
+    return (
+      <header className="app-header">
+        <div className="app-header__logo" onClick={() => window.location.href="/"}>
+          <div className="app-header__logo-icon">🤟</div>
+          <h3 className="app-header__title">SignWave</h3>
+        </div>
+        <div className="app-header__right">
+          {isAdmin && (
+            <button className="app-header__admin-btn" onClick={() => window.location.href="/admin"}>
+              Admin
+            </button>
+          )}
+          <button className="app-header__logout" onClick={handleLogout}>{t('log_out')}</button>
+        </div>
+      </header>
+    );
+  };
+
   return (
     <Router>
       <div className="App">
-        {token && (
-          <header className="app-header">
-            <div className="app-header__logo" onClick={() => window.location.href="/"}>
-              <div className="app-header__logo-icon">🤟</div>
-              <h3 className="app-header__title">SignWave</h3>
-            </div>
-            <div className="app-header__right">
-              {isAdmin && (
-                <button className="app-header__admin-btn" onClick={() => window.location.href="/admin"}>
-                  Admin
-                </button>
-              )}
-              <button className="app-header__logout" onClick={handleLogout}>{t('log_out')}</button>
-            </div>
-          </header>
-        )}
+        <AppHeader />
 
         <Routes>
           <Route path="/auth" element={!token ? <AuthPage onLoginSuccess={(t) => setToken(t)} /> : <Navigate to="/" />} />
-          <Route path="/" element={<PrivateRoute><MainDashboard models={models} /></PrivateRoute>} />
+          <Route path="/" element={<PrivateRoute><MainDashboard models={models} isAdmin={isAdmin} /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><SettingsPage models={models} /></PrivateRoute>} />
           

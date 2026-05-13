@@ -53,34 +53,26 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
 
       console.log("Visible:", isPersonVisible, "Buffer:", frameBuffer.current.length);
       
-      if (!isPredicting.current) {
-    if (!isPersonVisible) {
-        // ЛЮДИНИ НЕМАЄ: очищуємо і показуємо статус
+      if (!isPersonVisible) {
         frameBuffer.current = [];
         setPrediction({ label: 'No data', confidence: 0 });
-    } else {
-        // ЛЮДИНА В КАДРІ: збираємо дані
+      } else {
+        // буфер оновлюється завжди, навіть поки йде запит
         const currentFrameFeatures = extractFeatures(poseResult, handResult);
         frameBuffer.current.push(currentFrameFeatures);
-
-        // Тримаємо буфер у межах 30 кадрів (sliding window)
         if (frameBuffer.current.length > 30) {
             frameBuffer.current.shift();
         }
 
-        // ВІДПРАВЛЯЄМО НА ПЕРЕВІРКУ КОЛИ БУФЕР ПОВНИЙ
-        if (frameBuffer.current.length === 30) {
+        if (frameBuffer.current.length === 30 && !isPredicting.current) {
             sendToPredict(computeDeltaFeatures([...frameBuffer.current]));
-        } else {
-            // Поки буфер заповнюється (від 1 до 29 кадру), 
-            // показуємо користувачеві, що йде процес аналізу
-            setPrediction(prev => ({ 
-                label: prev.label === '' || prev.label === 'No data' ? 'Analyzing...' : prev.label, 
-                confidence: prev.confidence 
+        } else if (frameBuffer.current.length < 30) {
+            setPrediction(prev => ({
+                label: prev.label === '' || prev.label === 'No data' ? 'Analyzing...' : prev.label,
+                confidence: prev.confidence
             }));
         }
-    }
-}
+      }
       
       // 3. Малювання скелета
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -106,18 +98,19 @@ const sendToPredict = async (features) => {
     });
     const result = await response.json();
 
-    if (result.confidence > 0.3) {
+    if (result.confidence > 0.6) {
+      // smoothing disabled
       predictionHistory.current.push({ label: result.label, confidence: result.confidence });
       if (predictionHistory.current.length > 5) predictionHistory.current.shift();
-
       const scores = {};
       predictionHistory.current.forEach(({ label, confidence }) => {
         scores[label] = (scores[label] || 0) + confidence;
       });
       const smoothedLabel = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
       const smoothedConf = scores[smoothedLabel] / predictionHistory.current.length;
-
       setPrediction({ label: smoothedLabel, confidence: smoothedConf });
+
+      setPrediction({ label: result.label, confidence: result.confidence });
     }
 
     if (result.confidence > 0.8) {
@@ -204,19 +197,26 @@ const sendToPredict = async (features) => {
 {prediction.label && (
   <div style={{
     position: 'absolute',
-    bottom: '20px',
+    bottom: '12px',
     left: '50%',
     transform: 'translateX(-50%)',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    color: prediction.confidence > 0.8 ? '#00FF00' : '#FFD700', // Зелений якщо ок, жовтий якщо думає
-    padding: '10px 20px',
+    color: prediction.confidence > 0.8 ? '#00FF00' : '#FFD700',
+    padding: '8px 14px',
     borderRadius: '15px',
-    fontSize: '20px',
+    fontSize: 'clamp(12px, 3.5vw, 20px)',
     fontWeight: 'bold',
     zIndex: 10,
-    border: `2px solid ${prediction.confidence > 0.8 ? '#00FF00' : '#FFD700'}`
+    border: `2px solid ${prediction.confidence > 0.8 ? '#00FF00' : '#FFD700'}`,
+    maxWidth: '90%',
+    textAlign: 'center',
+    wordBreak: 'break-word',
+    lineHeight: 1.3,
   }}>
-    {prediction.label.toUpperCase()} ({(prediction.confidence * 100).toFixed(0)}%)
+    {prediction.label.toUpperCase()}
+    <span style={{ fontSize: 'clamp(12px, 3.5vw, 20px)', marginLeft: '6px', opacity: 0.9 }}>
+      {(prediction.confidence * 100).toFixed(0)}%
+    </span>
   </div>
 )}
       </div>

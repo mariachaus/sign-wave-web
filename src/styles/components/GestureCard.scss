@@ -17,7 +17,7 @@
   &:hover { transform: scale(1.05); }
 
   &.active {
-    background-color: var(--color-secondary);
+    background-color: var(--color-primary);
     border-color: var(--color-primary);
 
     .gesture-card__name { color: #fff; }

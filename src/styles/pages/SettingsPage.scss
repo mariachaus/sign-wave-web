@@ -192,9 +192,9 @@
   font-size: 0.9375rem;
   font-family: inherit;
   transition: background 0.2s;
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary);
 
-  &:hover { background-color: var(--color-secondary-dark); }
+  &:hover { background-color: var(--color-primary-dark); }
 
   &.primary {
     background-color: var(--color-primary);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/pages/TermsPage.scss';
@@ -6,7 +6,8 @@ import '../styles/pages/TermsPage.scss';
 const TermsPage = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const isUk = i18n.language === 'uk';
+  const [localLang, setLocalLang] = useState(i18n.language === 'uk' ? 'uk' : 'en');
+  const isUk = localLang === 'uk';
 
   const sections = isUk ? [
     {
@@ -344,6 +345,20 @@ const TermsPage = () => {
           <p className="terms-meta">
             {isUk ? 'Версія 1.0 · Набирає чинності: травень 2026' : 'Version 1.0 · Effective: May 2026'}
           </p>
+          <div className="terms-lang-switch">
+            <button
+              className={`terms-lang-btn${isUk ? ' terms-lang-btn--active' : ''}`}
+              onClick={() => setLocalLang('uk')}
+            >
+              УКР
+            </button>
+            <button
+              className={`terms-lang-btn${!isUk ? ' terms-lang-btn--active' : ''}`}
+              onClick={() => setLocalLang('en')}
+            >
+              ENG
+            </button>
+          </div>
         </div>
 
         <div className="terms-layout">

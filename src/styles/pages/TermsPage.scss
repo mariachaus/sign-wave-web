@@ -64,6 +64,35 @@
   margin: 0;
 }
 
+.terms-lang-switch {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.terms-lang-btn {
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-subtle);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &--active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+  }
+}
+
 /* ── Two-column layout ──────────────────────────────────────────── */
 .terms-layout {
   display: grid;
@@ -197,7 +226,7 @@
   background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
