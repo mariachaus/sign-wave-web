@@ -178,7 +178,7 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
   const [files, setFiles] = useState([]);
   const [globalLabel, setGlobalLabel] = useState(localStorage.getItem("lastLabel") || "");
   const [globalSequenceLength, setGlobalSequenceLength] = useState(
-    Number(localStorage.getItem("lastSequenceLength")) || 30
+    Number(localStorage.getItem("lastSequenceLength")) || 20
   );
 
   const handleMultipleFilesChange = (e) => {
