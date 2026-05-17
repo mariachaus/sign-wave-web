@@ -1,31 +1,32 @@
 import React from 'react';
+import '../styles/components/ErrorBoundary.scss';
 
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  state = { hasError: false, error: null };
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, info) {
-    console.error('ErrorBoundary caught:', error, info.componentStack);
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '3rem', textAlign: 'center' }}>
-          <h2>Щось пішло не так</h2>
-          <p>Спробуйте оновити сторінку.</p>
-          <button onClick={() => this.setState({ hasError: false })}>
+        <div className="error-boundary">
+          <div className="error-boundary__icon">⚠</div>
+          <h2 className="error-boundary__title">Щось пішло не так</h2>
+          <p className="error-boundary__message">
+            {this.state.error?.message || 'Невідома помилка'}
+          </p>
+          <button
+            className="error-boundary__btn"
+            onClick={() => this.setState({ hasError: false, error: null })}
+          >
             Спробувати знову
           </button>
         </div>
       );
     }
+
     return this.props.children;
   }
 }

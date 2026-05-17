@@ -3,18 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { extractFeatures } from '../utils/feature_extractor';
 import API_BASE_URL from '../config/api';
 import '../styles/components/WebcamAnalyzer.scss';
-
-const IconCamera = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-    <circle cx="12" cy="13" r="4"/>
-  </svg>
-);
-const IconStop = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="4" y="4" width="16" height="16" rx="2"/>
-  </svg>
-);
+import { IconCamera, IconStop } from './Icons';
 
 const MP = window.MP_VISION || {};
 const DrawingUtils = MP.DrawingUtils;
@@ -79,13 +68,13 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
         // буфер оновлюється завжди, навіть поки йде запит
         const currentFrameFeatures = extractFeatures(poseResult, handResult);
         frameBuffer.current.push(currentFrameFeatures);
-        if (frameBuffer.current.length > 30) {
+        if (frameBuffer.current.length > 20) {
             frameBuffer.current.shift();
         }
 
-        if (frameBuffer.current.length === 30 && !isPredicting.current) {
+        if (frameBuffer.current.length === 20 && !isPredicting.current) {
             sendToPredict(computeDeltaFeatures([...frameBuffer.current]));
-        } else if (frameBuffer.current.length < 30) {
+        } else if (frameBuffer.current.length < 20) {
             setPrediction(prev => ({
                 label: prev.label === '' || prev.label === 'No data' ? 'Analyzing...' : prev.label,
                 confidence: prev.confidence

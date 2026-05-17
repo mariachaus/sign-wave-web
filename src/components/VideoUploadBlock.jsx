@@ -12,21 +12,11 @@ const HandLandmarker = MP.HandLandmarker;
 import { drawAllLandmarks, hiddenPoseIds } from '../utils/drawing_utils';
 import { exportLandmarksToVector } from '../utils/csv_manager';
 
+import { IconPlay, IconPlus, IconCheck, IconLoader } from './Icons';
+
 // ============================================================================
 // 1. ДОЧІРНІЙ КОМПОНЕНТ: Відповідає суворо за ОДНЕ відео
 // ============================================================================
-const IconPlay = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-);
-const IconPlus = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-);
-const IconCheck = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
-);
-const IconLoader = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-);
 
 const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence }) => {
   const { t } = useTranslation();

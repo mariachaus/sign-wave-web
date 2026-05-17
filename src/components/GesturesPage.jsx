@@ -12,7 +12,7 @@ const GesturesPage = () => {
   const [categoryDescriptions, setCategoryDescriptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [collapsedCategories, setCollapsedCategories] = useState({});
-
+  
   useEffect(() => {
     setLoading(true);
     const lang = i18n.language;

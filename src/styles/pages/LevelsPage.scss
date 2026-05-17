@@ -24,7 +24,7 @@
 
 .levels-overall-progress {
   padding: 16px 20px;
-  background: linear-gradient(135deg, var(--color-secondary-light), #FFF7ED 140%);
+  background: linear-gradient(135deg, var(--color-secondary-light), var(--color-surface) 140%);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -51,7 +51,7 @@
 
   &__bar {
     height: 7px;
-    background: #ffffff;
+    background: var(--color-border);
     border-radius: 99px;
     overflow: hidden;
   }
