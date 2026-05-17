@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-
+import { useTranslation } from 'react-i18next';
+import '../styles/components/VideoUploadBlock.scss';
 import { extractFeatures } from '../utils/feature_extractor';
 
 
@@ -14,17 +15,31 @@ import { exportLandmarksToVector } from '../utils/csv_manager';
 // ============================================================================
 // 1. ДОЧІРНІЙ КОМПОНЕНТ: Відповідає суворо за ОДНЕ відео
 // ============================================================================
-const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddSequence }) => {
+const IconPlay = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+);
+const IconPlus = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+);
+const IconCheck = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20,6 9,17 4,12"/></svg>
+);
+const IconLoader = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+);
+
+const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence }) => {
+  const { t } = useTranslation();
   const [videoSrc, setVideoSrc] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0); 
+  const [progress, setProgress] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
   const [startTime, setStartTime] = useState(0);
   const [extractedSequence, setExtractedSequence] = useState(null);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const SEQUENCE_LENGTH = 30;
+  const SEQUENCE_LENGTH = sequenceLength;
 
   // Коли приходить новий файл, створюємо для нього URL
   useEffect(() => {
@@ -64,19 +79,30 @@ const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddS
     const captureLoop = async () => {
       if (video.paused || video.ended || framesBuffer.length >= SEQUENCE_LENGTH) {
         video.pause();
-        setIsProcessing(false);
-        
+
         if (framesBuffer.length > 0 && framesBuffer.length < SEQUENCE_LENGTH) {
-            const lastFrame = framesBuffer[framesBuffer.length - 1];
             const missingFramesCount = SEQUENCE_LENGTH - framesBuffer.length;
             for (let i = 0; i < missingFramesCount; i++) {
-                framesBuffer.push([...lastFrame]); 
+                await new Promise(r => requestAnimationFrame(r));
+                const ts = performance.now();
+                const poseResult = await poseModel.detectForVideo(video, ts);
+                const handResult = await handModel.detectForVideo(video, ts);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawAllLandmarks(
+                  drawingUtils, poseResult, handResult,
+                  PoseLandmarker.POSE_CONNECTIONS, HandLandmarker.HAND_CONNECTIONS
+                );
+                const vector = extractFeatures(poseResult, handResult);
+                framesBuffer.push(vector);
+                setProgress(framesBuffer.length);
             }
         }
-        
+
+        setIsProcessing(false);
+
         if (framesBuffer.length === SEQUENCE_LENGTH) {
             setExtractedSequence(framesBuffer);
-            setProgress(SEQUENCE_LENGTH); 
+            setProgress(SEQUENCE_LENGTH);
         } else {
             alert(`Помилка у файлі ${file.name}: не вдалося розпізнати кадри.`);
         }
@@ -115,32 +141,40 @@ const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddS
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '15px', borderRadius: '8px', background: '#f9f9f9' }}>
-      <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', wordBreak: 'break-all' }}>📄 {file.name}</h4>
-      
-      <div style={{ position: 'relative' }}>
-        <video ref={videoRef} src={videoSrc} muted style={{ width: '100%', borderRadius: '4px', transform: 'none' }} crossOrigin="anonymous" />
-        <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', transform: 'none' }} />
+    <div className={`video-processor${isAdded ? ' video-processor--added' : ''}`}>
+      <h4 className="video-processor__title">{file.name}</h4>
+
+      <div className="video-processor__video-wrap">
+        <video ref={videoRef} src={videoSrc} muted className="video-processor__video" crossOrigin="anonymous" />
+        <canvas ref={canvasRef} className="video-processor__canvas" />
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px', alignItems: 'center' }}>
-        <label style={{ fontSize: '12px' }}>Старт з (сек):</label>
-        <input 
-          type="number" step="0.1" min="0" 
+      <div className="video-processor__controls">
+        <label className="video-processor__start-label">{t('start_sec')}:</label>
+        <input
+          type="number" step="0.1" min="0"
           value={startTime} onChange={(e) => setStartTime(e.target.value)}
-          disabled={isProcessing} style={{ width: '60px', padding: '4px' }}
+          disabled={isProcessing}
+          className="video-processor__start-input"
         />
-        
-        <button onClick={processVideo} disabled={isProcessing || !gestureLabel} style={{ padding: '6px 12px', backgroundColor: isProcessing ? '#ffa500' : '#007bff', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px', flexGrow: 1 }}>
-          {isProcessing ? `⏳ ${progress}/${SEQUENCE_LENGTH}` : `▶️ Обробити`}
+        <button
+          onClick={processVideo}
+          disabled={isProcessing || !gestureLabel}
+          className={`video-processor__process-btn${isProcessing ? ' video-processor__process-btn--running' : ''}`}
+        >
+          {isProcessing ? <><IconLoader /> {progress}/{SEQUENCE_LENGTH}</> : <><IconPlay /> {t('process_video')}</>}
         </button>
-        
-        {extractedSequence && !isProcessing && (
-          <button onClick={handleAddData} disabled={isAdded} style={{ padding: '6px 12px', backgroundColor: isAdded ? 'gray' : '#28a745', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px', width: '100%' }}>
-            {isAdded ? "✅ Додано!" : "➕ Додати в JSON"}
-          </button>
-        )}
       </div>
+
+      {extractedSequence && !isProcessing && (
+        <button
+          onClick={handleAddData}
+          disabled={isAdded}
+          className={`video-processor__add-btn${isAdded ? ' video-processor__add-btn--done' : ''}`}
+        >
+          {isAdded ? <><IconCheck /> {t('added_to_json')}</> : <><IconPlus /> {t('add_to_json')}</>}
+        </button>
+      )}
     </div>
   );
 };
@@ -150,8 +184,12 @@ const SingleVideoProcessor = ({ file, gestureLabel, poseModel, handModel, onAddS
 // 2. БАТЬКІВСЬКИЙ КОМПОНЕНТ: Керує списком файлів
 // ============================================================================
 const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
+  const { t } = useTranslation();
   const [files, setFiles] = useState([]);
   const [globalLabel, setGlobalLabel] = useState(localStorage.getItem("lastLabel") || "");
+  const [globalSequenceLength, setGlobalSequenceLength] = useState(
+    Number(localStorage.getItem("lastSequenceLength")) || 30
+  );
 
   const handleMultipleFilesChange = (e) => {
     // Перетворюємо FileList на звичайний масив
@@ -165,45 +203,71 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
     localStorage.setItem("lastLabel", val);
   };
 
+  const handleSequenceLengthChange = (val) => {
+    setGlobalSequenceLength(val);
+    localStorage.setItem("lastSequenceLength", val);
+  };
+
   return (
-    <div className="upload-block" style={{ marginBottom: '30px', border: '1px solid #ddd', padding: '20px', borderRadius: '8px' }}>
-      <h2>Пакетне завантаження відео</h2>
-      
-      {/* Спільна назва жесту для всіх вибраних файлів */}
-      <div style={{ marginBottom: '20px', padding: '15px', background: '#e9ecef', borderRadius: '6px' }}>
-        <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Спільна назва жесту для всіх відео:</label>
-        <input 
-          type="text" 
-          placeholder="Напр. hello" 
-          value={globalLabel} 
-          onChange={handleLabelChange}
-          style={{ padding: '10px', width: '100%', boxSizing: 'border-box', fontSize: '16px' }}
-        />
+    <div className="upload-block">
+      <h2 className="upload-block__title">{t('batch_upload_title')}</h2>
+
+      <div className="upload-settings">
+        <div className="upload-settings__field">
+          <label className="upload-settings__label">{t('gesture_label_for_all')}:</label>
+          <input
+            type="text"
+            placeholder={t('gesture_label_placeholder')}
+            value={globalLabel}
+            onChange={handleLabelChange}
+            className="upload-settings__text-input"
+          />
+        </div>
+
+        <div className="upload-settings__field">
+          <label className="upload-settings__label">{t('frames_for_all')}:</label>
+          <div className="upload-settings__radios">
+            {[20, 30].map((n) => (
+              <label key={n} className="upload-settings__radio-label">
+                <input
+                  type="radio"
+                  name="sequenceLength"
+                  value={n}
+                  checked={globalSequenceLength === n}
+                  onChange={() => handleSequenceLengthChange(n)}
+                />
+                {n} {t('frames')}
+              </label>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Кнопка вибору БАГАТЬОХ файлів (додано атрибут multiple) */}
-      <input 
-        type="file" 
-        accept="video/mp4,video/webm,video/quicktime" 
-        multiple 
-        onChange={handleMultipleFilesChange} 
-        style={{ marginBottom: '20px' }}
-      />
+      <label className="upload-block__file-label">
+        <IconPlus />
+        {files.length > 0 ? t('change_files') : t('choose_files')}
+        <input
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime"
+          multiple
+          onChange={handleMultipleFilesChange}
+          className="upload-block__file-input"
+        />
+      </label>
 
-      {/* Якщо файли вибрано, створюємо сітку з відео */}
       {files.length > 0 && (
-        <div>
-          <p>Вибрано файлів: <b>{files.length}</b></p>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '15px' }}>
+        <div className="upload-grid">
+          <p className="upload-grid__count">{t('files_selected')}: <b>{files.length}</b></p>
+          <div className="upload-grid__list">
             {files.map((file, index) => (
-              <SingleVideoProcessor 
-                key={index} 
-                file={file} 
-                gestureLabel={globalLabel} 
-                poseModel={poseModel} 
-                handModel={handModel} 
-                onAddSequence={onAddSequence} 
+              <SingleVideoProcessor
+                key={index}
+                file={file}
+                gestureLabel={globalLabel}
+                sequenceLength={globalSequenceLength}
+                poseModel={poseModel}
+                handModel={handModel}
+                onAddSequence={onAddSequence}
               />
             ))}
           </div>

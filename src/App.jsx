@@ -19,6 +19,7 @@ import API_BASE_URL from "./config/api";
 import { applyTheme, applyFontSize } from './utils/theme';
 
 import axios from 'axios';
+import ErrorBoundary from './components/ErrorBoundary';
 import './styles/global.scss';
 
 function App() {
@@ -139,13 +140,13 @@ function App() {
       <div className="App">
         <AppHeader />
 
+        <ErrorBoundary>
         <Routes>
           <Route path="/auth" element={!token ? <AuthPage onLoginSuccess={(t) => setToken(t)} /> : <Navigate to="/" />} />
           <Route path="/" element={<PrivateRoute><MainDashboard models={models} isAdmin={isAdmin} /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><SettingsPage models={models} /></PrivateRoute>} />
           
-          {/* Ці маршрути також краще захистити PrivateRoute, якщо вони потребують токена для API */}
           <Route path="/gestures" element={<PrivateRoute><GesturesPage /></PrivateRoute>} />
           <Route path="/gestures/:id" element={<PrivateRoute><GestureDetailsPage /></PrivateRoute>} />
           <Route path="/learn" element={<PrivateRoute><LevelsPage /></PrivateRoute>} />
@@ -158,6 +159,7 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>
+        </ErrorBoundary>
       </div>
     </Router>
   );

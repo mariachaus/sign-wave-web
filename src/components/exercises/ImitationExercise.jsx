@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import WebcamAnalyzer from '../WebcamAnalyzer';
 
+const SKIP_DELAY_MS = 15000;
+
 const ImitationExercise = ({ gesture, onSuccess, models }) => {
+  const { t } = useTranslation();
   const [progress, setProgress] = useState(0);
+  const [showSkip, setShowSkip] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSkip(true), SKIP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleGestureDetected = (detectedLabel) => {
     if (detectedLabel === gesture.model_label) {
@@ -31,6 +41,12 @@ const ImitationExercise = ({ gesture, onSuccess, models }) => {
           <div className="imitation-exercise__progress-fill" style={{ width: `${progress}%` }} />
         </div>
       </div>
+
+      {showSkip && (
+        <button className="exercise-btn exercise-btn--skip" onClick={onSuccess}>
+          {t('skip_gesture')}
+        </button>
+      )}
     </div>
   );
 };

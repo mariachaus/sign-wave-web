@@ -25,6 +25,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import API_BASE_URL from "../config/api";
 import WebcamAnalyzer from './WebcamAnalyzer';
+import ConfirmModal from './ConfirmModal';
 import { applyTheme, applyFontSize } from '../utils/theme';
 import '../styles/pages/SettingsPage.scss';
 
@@ -38,6 +39,9 @@ const SettingsPage = ({ models }) => {
   const togglePw = (field) => setShowPasswords(p => ({ ...p, [field]: !p[field] }));
 
   const [profileData, setProfileData] = useState({ username: '', email: '' });
+  const [originalEmail, setOriginalEmail] = useState('');
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [passwordData, setPasswordData] = useState({ old_password: '', new_password: '', confirm_password: '' });
 
   const [uiSettings, setUiSettings] = useState({
@@ -62,6 +66,7 @@ const SettingsPage = ({ models }) => {
         });
         if (res.data.profile) {
           setProfileData({ username: res.data.profile.username, email: res.data.profile.email });
+          setOriginalEmail(res.data.profile.email);
         }
         if (res.data.ui) {
           const ui = res.data.ui;
@@ -126,15 +131,24 @@ const SettingsPage = ({ models }) => {
     }
   };
 
-  const handleUpdateProfile = async () => {
+  const saveProfile = async () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(`${API_BASE_URL}/api/settings/update-profile`, profileData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      setOriginalEmail(profileData.email);
       showStatus(t('status_profile_updated'), 'success');
     } catch (err) {
       showStatus(err.response?.data?.error || "Update failed", 'error');
+    }
+  };
+
+  const handleUpdateProfile = () => {
+    if (profileData.email !== originalEmail) {
+      setShowEmailConfirm(true);
+    } else {
+      saveProfile();
     }
   };
 
@@ -156,18 +170,19 @@ const SettingsPage = ({ models }) => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (window.confirm(t('confirm_delete_account'))) {
-      try {
-        const token = localStorage.getItem('token');
-        await axios.delete(`${API_BASE_URL}/api/settings/delete-account`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        localStorage.clear();
-        window.location.href = '/auth';
-      } catch (err) {
-        showStatus("Delete failed", 'error');
-      }
+  const handleDeleteAccount = () => setShowDeleteConfirm(true);
+
+  const confirmDeleteAccount = async () => {
+    setShowDeleteConfirm(false);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/settings/delete-account`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      localStorage.clear();
+      window.location.href = '/auth';
+    } catch (err) {
+      showStatus("Delete failed", 'error');
     }
   };
 
@@ -324,25 +339,41 @@ const SettingsPage = ({ models }) => {
           </div>
 
           <button className="save-btn" onClick={handleUpdateUI}>{t('save_video')}</button>
-          <button className="save-btn secondary" onClick={() => setShowPreview(true)}>📷 {t('test_camera')}</button>
+          <button className="save-btn secondary" onClick={() => setShowPreview(true)}>{t('test_camera')}</button>
         </div>
       )}
 
       {/* CAMERA PREVIEW */}
       {showPreview && (
         <div className="camera-preview">
-          <div
-            className="camera-preview__frame"
-            style={{ border: `4px solid ${uiSettings.landmark_color}` }}
-          >
-            {models && (
-              <WebcamAnalyzer poseModel={models.video.pose} handModel={models.video.hand} />
-            )}
-          </div>
-          <button className="save-btn" style={{ marginTop: '15px' }} onClick={() => setShowPreview(false)}>
+          {models && (
+            <WebcamAnalyzer poseModel={models.video.pose} handModel={models.video.hand} isMirror={uiSettings.is_mirror_view} />
+          )}
+          <button className="save-btn danger" onClick={() => setShowPreview(false)}>
             {t('close_preview')}
           </button>
         </div>
+      )}
+      {showEmailConfirm && (
+        <ConfirmModal
+          message={t('confirm_email_change', { email: profileData.email })}
+          confirmLabel={t('confirm')}
+          cancelLabel={t('cancel')}
+          variant="primary"
+          onConfirm={() => { setShowEmailConfirm(false); saveProfile(); }}
+          onCancel={() => setShowEmailConfirm(false)}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmModal
+          message={t('confirm_delete_account')}
+          confirmLabel={t('delete_account')}
+          cancelLabel={t('cancel')}
+          variant="danger"
+          onConfirm={confirmDeleteAccount}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       )}
     </div>
   );

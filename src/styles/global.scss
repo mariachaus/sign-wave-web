@@ -15,8 +15,9 @@
   --color-success-light: oklch(95% 0.06 165);
 
   /* Danger */
-  --color-danger:      #ef4444;
-  --color-danger-dark: #dc2626;
+  --color-danger:       #ef4444;
+  --color-danger-dark:  #dc2626;
+  --color-danger-light: oklch(95% 0.06 25);
 
   /* Warm neutral palette */
   --color-bg:          #FAFAF8;
@@ -58,8 +59,9 @@
   --color-success:       oklch(65% 0.14 165);
   --color-success-light: oklch(25% 0.08 165);
 
-  --color-danger:      #f87171;
-  --color-danger-dark: #ef4444;
+  --color-danger:       #f87171;
+  --color-danger-dark:  #ef4444;
+  --color-danger-light: oklch(25% 0.08 25);
 
   --color-bg:          #111110;
   --color-surface:     #1C1B19;
@@ -269,9 +271,6 @@ a { text-decoration: none; }
 video {
   clear: both;
   display: block;
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
-  -moz-transform: rotateY(180deg);
 }
 
 section {
@@ -330,24 +329,7 @@ header, footer { clear: both; }
   position: relative;
 }
 
-input[type='file'] { display: block; }
 
-/* ===== UPLOAD GRID ===== */
-.upload-grid {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-}
-
-.upload-block {
-  width: 48%;
-  background: var(--color-surface);
-  padding: 16px;
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border);
-}
 
 /* ===== WEBCAM / CANVAS ===== */
 .video-container {
@@ -396,10 +378,7 @@ input[type='file'] { display: block; }
 
   .videoView, .detectOnClick { width: 100%; margin: 2% 0; }
 
-  .upload-grid { flex-direction: column; gap: 15px; }
-  .upload-block { width: 100%; }
-
-  h1 { font-size: 1.375rem; }
+h1 { font-size: 1.375rem; }
   h2 { font-size: 1.125rem; }
 
   .data-controls { margin: 20px 0 !important; }

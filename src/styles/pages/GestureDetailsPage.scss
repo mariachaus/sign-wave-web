@@ -93,10 +93,6 @@
   video {
     width: 100%;
     height: 100%;
-    /* override global webcam mirror — this is a regular video */
-    transform: none;
-    -webkit-transform: none;
-    -moz-transform: none;
   }
 }
 

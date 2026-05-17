@@ -186,10 +186,16 @@
   padding: 20px;
 
   &__icon {
-    font-size: 1.375rem;
     line-height: 1;
     margin-bottom: 8px;
+    display: flex;
+    svg { width: 28px; height: 28px; }
   }
+
+  &--streak &__icon { stroke: oklch(74% 0.18 45);  color: oklch(74% 0.18 45); }
+  &--bolt   &__icon { stroke: oklch(74% 0.18 75);  color: oklch(74% 0.18 75); }
+  &--hand   &__icon { stroke: oklch(68% 0.20 290); color: oklch(68% 0.20 290); }
+  &--xp     &__icon { stroke: oklch(74% 0.18 75);  color: oklch(74% 0.18 75); }
 
   &__value {
     font-size: 1.25rem;

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API, headers, useDebounce } from './adminUtils';
 
@@ -37,6 +38,7 @@ const AdminLessonsTab = () => {
   const [contentEditFields, setContentEditFields] = useState({ title: '', body_text: '', image_url: '', order_index: 1 });
 
   const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
   const fail = (err) => setErrorMsg(err.response?.data?.detail || t('admin_error_generic'));
 
   const loadLevels = useCallback(() => {
@@ -275,6 +277,10 @@ const AdminLessonsTab = () => {
                         <button className="admin-btn admin-btn--sm"
                           onClick={() => patchLesson(ls.id, { is_active: !ls.is_active })}>
                           {ls.is_active ? t('admin_deactivate') : t('admin_activate')}
+                        </button>
+                        <button className="admin-btn admin-btn--sm"
+                          onClick={() => navigate(`/lesson/${ls.id}`)}>
+                          {t('admin_preview')}
                         </button>
                         <button className={`admin-btn admin-btn--sm${expandedId === ls.id ? ' admin-btn--active' : ''}`}
                           onClick={() => expandedId === ls.id ? setExpandedId(null) : expandLesson(ls)}>

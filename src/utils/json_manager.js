@@ -12,7 +12,8 @@ export const downloadJSONDataset = (dataset) => {
     const link = document.createElement("a");
     link.href = url;
 
-    link.download = `dataset_${new Date().getTime()}.json`;
+    const labels = [...new Set(dataset.map(d => d.label))].join('_');
+    link.download = `dataset_${labels}.json`;
     
     document.body.appendChild(link);
     link.click();

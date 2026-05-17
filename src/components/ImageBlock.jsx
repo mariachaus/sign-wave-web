@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
-// 1. ВИПРАВЛЕННЯ: Дістаємо константи та класи з MP_VISION
+import { useTranslation } from 'react-i18next';
+import '../styles/components/ImageBlock.scss';
+
 const MP = window.MP_VISION || {};
 const DrawingUtils = MP.DrawingUtils;
 const PoseLandmarker = MP.PoseLandmarker;
@@ -8,7 +10,25 @@ const HandLandmarker = MP.HandLandmarker;
 import { drawAllLandmarks, hiddenPoseIds } from '../utils/drawing_utils';
 import { exportLandmarksToVector } from '../utils/csv_manager';
 
+const IconImage = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+    <polyline points="21 15 16 10 5 21"/>
+  </svg>
+);
+const IconPlus = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+
 const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
+  const { t } = useTranslation();
   const [imageSrc, setImageSrc] = useState(null);
   const [coordsText, setCoordsText] = useState("");
   const [gestureLabel, setGestureLabel] = useState(localStorage.getItem("lastLabel") || "");
@@ -33,7 +53,6 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
   };
 
   const handleDetect = async () => {
-    // 2. ДОДАТКОВА ПЕРЕВІРКА: чи завантажилися класи
     if (!poseModel || !handModel || !imgRef.current || !DrawingUtils) {
       console.error("Models or DrawingUtils not ready");
       return;
@@ -42,24 +61,21 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
     const img = imgRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    
+
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-    
-    // Тепер DrawingUtils має бути доступним як конструктор
+
     const drawingUtils = new DrawingUtils(ctx);
 
     const poseResult = await poseModel.detect(img);
     const handResult = await handModel.detect(img);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // 3. ВИПРАВЛЕННЯ: використовуємо константи з MP (PoseLandmarker.POSE_CONNECTIONS)
     drawAllLandmarks(
-      drawingUtils, 
-      poseResult, 
-      handResult, 
-      PoseLandmarker.POSE_CONNECTIONS, 
+      drawingUtils,
+      poseResult,
+      handResult,
+      PoseLandmarker.POSE_CONNECTIONS,
       HandLandmarker.HAND_CONNECTIONS
     );
 
@@ -67,14 +83,12 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
     generateCoordsText(poseResult, handResult);
   };
 
-  // ... (решта функцій generateCoordsText та handleAddData без змін)
-
   const generateCoordsText = (poseResult, handResult) => {
     let text = "";
     if (poseResult.landmarks?.length > 0) {
       text += "=== POSE ===\n";
       poseResult.landmarks[0].forEach((lm, i) => {
-        let status = hiddenPoseIds.includes(i) ? "[HIDDEN] " : "";
+        const status = hiddenPoseIds.includes(i) ? "[HIDDEN] " : "";
         text += `Pt ${i} ${status}: ${lm.x.toFixed(3)}, ${lm.y.toFixed(3)}\n`;
       });
     }
@@ -90,50 +104,58 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
 
   const handleAddData = () => {
     if (!gestureLabel || !results?.pose?.landmarks?.[0]) return;
-    
     localStorage.setItem("lastLabel", gestureLabel);
     const vector = exportLandmarksToVector(results.pose.landmarks[0], results.hand);
-    
     onAddRecord({ label: gestureLabel, data: vector });
     setIsAdded(true);
   };
 
   return (
-    <div className="upload-block" style={{ marginBottom: '30px', border: '1px solid #ddd', padding: '15px' }}>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      
+    <div className="image-block">
+      <label className="image-block__file-label">
+        <IconImage />
+        {imageSrc ? t('change_image') : t('choose_image')}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="image-block__file-input"
+        />
+      </label>
+
       {imageSrc && (
-        <div className="detectOnClick" style={{ position: 'relative', marginTop: '10px' }}>
-          <img 
-            ref={imgRef}
-            src={imageSrc} 
-            alt="Preview" 
-            style={{ width: '100%', cursor: 'pointer' }} 
-            onClick={handleDetect}
-            crossOrigin="anonymous"
-          />
-          <canvas 
-            ref={canvasRef} 
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} 
-          />
-        </div>
-      )}
-      {/* ... решта JSX ... */}
-      {coordsText && (
-        <div className="landmark-output" style={{ marginTop: '10px' }}>
-          <pre style={{ height: '150px', overflowY: 'scroll', fontSize: '11px', background: '#f8f9fa', padding: '5px' }}>
-            {coordsText}
-          </pre>
-          
-          <div className="data-controls" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-            <input 
-              type="text" 
-              placeholder="Назва жесту" 
-              value={gestureLabel} 
-              onChange={(e) => setGestureLabel(e.target.value)}
+        <>
+          <div className="image-block__preview" onClick={handleDetect}>
+            <img
+              ref={imgRef}
+              src={imageSrc}
+              alt="Preview"
+              className="image-block__img"
+              crossOrigin="anonymous"
             />
-            <button onClick={handleAddData} disabled={isAdded}>
-              {isAdded ? "✅ Додано!" : "➕ Додати"}
+            <canvas ref={canvasRef} className="image-block__canvas" />
+          </div>
+          <p className="image-block__hint">{t('click_to_detect')}</p>
+        </>
+      )}
+
+      {coordsText && (
+        <div>
+          <pre className="image-output__coords">{coordsText}</pre>
+          <div className="image-output__controls">
+            <input
+              type="text"
+              placeholder={t('gesture_label_placeholder')}
+              value={gestureLabel}
+              onChange={(e) => setGestureLabel(e.target.value)}
+              className="image-output__label-input"
+            />
+            <button
+              onClick={handleAddData}
+              disabled={isAdded}
+              className={`image-output__add-btn${isAdded ? ' image-output__add-btn--done' : ''}`}
+            >
+              {isAdded ? <><IconCheck /> {t('added_to_csv')}</> : <><IconPlus /> {t('add_to_csv')}</>}
             </button>
           </div>
         </div>

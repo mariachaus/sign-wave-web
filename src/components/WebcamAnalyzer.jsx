@@ -1,6 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { extractFeatures } from '../utils/feature_extractor'; // Імпортуй функцію
-import API_BASE_URL from "../config/api"; // Імпортуй конфіг
+import { useTranslation } from 'react-i18next';
+import { extractFeatures } from '../utils/feature_extractor';
+import API_BASE_URL from '../config/api';
+import '../styles/components/WebcamAnalyzer.scss';
+
+const IconCamera = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </svg>
+);
+const IconStop = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="4" y="4" width="16" height="16" rx="2"/>
+  </svg>
+);
 
 const MP = window.MP_VISION || {};
 const DrawingUtils = MP.DrawingUtils;
@@ -9,7 +23,8 @@ const HandLandmarker = MP.HandLandmarker;
 
 import { drawAllLandmarks } from '../utils/drawing_utils';
 
-const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
+const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isMirrorProp }) => {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isWebcamRunning, setIsWebcamRunning] = useState(false);
@@ -40,6 +55,10 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected }) => {
     const drawingUtils = new DrawingUtils(ctx);
 
     if (video.readyState >= 2) {
+      if (canvas.width !== video.videoWidth) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
       const startTimeMs = performance.now();
       
       // 1. Отримуємо дані від MediaPipe
@@ -172,68 +191,43 @@ const sendToPredict = async (features) => {
     };
   }, []);
 
-  const isMirror = localStorage.getItem('mirror_view') !== 'false';
+  const isMirror = isMirrorProp !== undefined ? isMirrorProp : localStorage.getItem('mirror_view') !== 'false';
+  const mirrorStyle = { transform: isMirror ? 'scaleX(-1)' : 'scaleX(1)' };
+
+  const predictionMod = ['No data', 'Analyzing...'].includes(prediction.label)
+    ? 'muted'
+    : prediction.confidence > 0.8 ? 'good' : 'ok';
 
   return (
-    <div className="webcam-preview-simple">
-      <div style={{ position: 'relative', width: '100%', maxWidth: '640px', margin: '0 auto' }}>
-        <video 
-          ref={videoRef} 
-          autoPlay playsInline muted 
-          style={{ 
-            width: '100%', borderRadius: '25px', 
-            transform: isMirror ? 'scaleX(-1)' : 'none',
-            backgroundColor: '#000'
-          }} 
+    <div className="webcam-analyzer">
+      <div className="webcam-analyzer__video-wrap">
+        <video
+          ref={videoRef}
+          autoPlay playsInline muted
+          className="webcam-analyzer__video"
+          style={mirrorStyle}
         />
-        <canvas 
-          ref={canvasRef} 
-          style={{ 
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
-            transform: isMirror ? 'scaleX(-1)' : 'none' 
-          }} 
+        <canvas
+          ref={canvasRef}
+          className="webcam-analyzer__canvas"
+          style={mirrorStyle}
         />
-        {/* Блок з результатом передбачення */}
-{prediction.label && (
-  <div style={{
-    position: 'absolute',
-    bottom: '12px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    color: prediction.confidence > 0.8 ? '#00FF00' : '#FFD700',
-    padding: '8px 14px',
-    borderRadius: '15px',
-    fontSize: 'clamp(12px, 3.5vw, 20px)',
-    fontWeight: 'bold',
-    zIndex: 10,
-    border: `2px solid ${prediction.confidence > 0.8 ? '#00FF00' : '#FFD700'}`,
-    maxWidth: '90%',
-    textAlign: 'center',
-    wordBreak: 'break-word',
-    lineHeight: 1.3,
-  }}>
-    {prediction.label.toUpperCase()}
-    <span style={{ fontSize: 'clamp(12px, 3.5vw, 20px)', marginLeft: '6px', opacity: 0.9 }}>
-      {(prediction.confidence * 100).toFixed(0)}%
-    </span>
-  </div>
-)}
+        {prediction.label && (
+          <div className={`webcam-analyzer__prediction webcam-analyzer__prediction--${predictionMod}`}>
+            {prediction.label.toUpperCase()}
+            <span className="webcam-analyzer__prediction__conf">
+              {(prediction.confidence * 100).toFixed(0)}%
+            </span>
+          </div>
+        )}
       </div>
 
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <button 
-          onClick={toggleWebcam} 
-          style={{ 
-            padding: '12px 24px', 
-            backgroundColor: isWebcamRunning ? '#dc3545' : '#28a745', 
-            color: 'white', border: 'none', borderRadius: '25px', 
-            cursor: 'pointer', fontWeight: 'bold'
-          }}
-        >
-          {isWebcamRunning ? "🛑 Stop Camera" : "📷 Start Camera"}
-        </button>
-      </div>
+      <button
+        onClick={toggleWebcam}
+        className={`webcam-analyzer__toggle-btn webcam-analyzer__toggle-btn--${isWebcamRunning ? 'stop' : 'start'}`}
+      >
+        {isWebcamRunning ? <><IconStop /> {t('stop_camera')}</> : <><IconCamera /> {t('start_camera')}</>}
+      </button>
     </div>
   );
 };
