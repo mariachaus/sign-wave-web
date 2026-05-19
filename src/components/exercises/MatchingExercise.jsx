@@ -21,7 +21,7 @@ const MatchingExercise = ({ gestures, onSuccess, onError = () => {} }) => {
         setSelectedWord(null);
         setSelectedImage(null);
       } else {
-        onError(selectedWord.id);
+        onError({ gesture_id: selectedWord.id, exercise_type_id: 4, error_type: 'wrong_match' });
         const timer = setTimeout(() => { setSelectedWord(null); setSelectedImage(null); }, 500);
         return () => clearTimeout(timer);
       }

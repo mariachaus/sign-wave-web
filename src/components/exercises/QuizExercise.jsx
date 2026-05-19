@@ -25,7 +25,7 @@ const QuizExercise = ({ targetGesture, allGestures, onSuccess, onError = () => {
       setTimeout(() => onSuccess(), 1200);
     } else {
       setIsCorrect(false);
-      onError(targetGesture.id);
+      onError({ gesture_id: targetGesture.id, exercise_type_id: 5, error_type: 'wrong_quiz_answer' });
       setTimeout(() => { setSelectedId(null); setIsCorrect(null); }, 1000);
     }
   };

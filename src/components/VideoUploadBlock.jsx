@@ -18,7 +18,7 @@ import { IconPlay, IconPlus, IconCheck, IconLoader } from './Icons';
 // 1. ДОЧІРНІЙ КОМПОНЕНТ: Відповідає суворо за ОДНЕ відео
 // ============================================================================
 
-const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence }) => {
+const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence, onRemove }) => {
   const { t } = useTranslation();
   const [videoSrc, setVideoSrc] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -132,7 +132,10 @@ const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, h
 
   return (
     <div className={`video-processor${isAdded ? ' video-processor--added' : ''}`}>
-      <h4 className="video-processor__title">{file.name}</h4>
+      <div className="video-processor__header">
+        <h4 className="video-processor__title">{file.name}</h4>
+        <button className="video-processor__remove-btn" onClick={onRemove} disabled={isProcessing} title="Remove">×</button>
+      </div>
 
       <div className="video-processor__video-wrap">
         <video ref={videoRef} src={videoSrc} muted className="video-processor__video" crossOrigin="anonymous" />
@@ -176,16 +179,22 @@ const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, h
 const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
   const { t } = useTranslation();
   const [files, setFiles] = useState([]);
+  const [dragging, setDragging] = useState(false);
   const [globalLabel, setGlobalLabel] = useState(localStorage.getItem("lastLabel") || "");
   const [globalSequenceLength, setGlobalSequenceLength] = useState(
     Number(localStorage.getItem("lastSequenceLength")) || 20
   );
 
-  const handleMultipleFilesChange = (e) => {
-    // Перетворюємо FileList на звичайний масив
-    const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
+  const addFiles = (incoming) => {
+    const next = [...files];
+    const names = new Set(files.map(f => f.name));
+    for (const f of incoming) {
+      if (f.type.startsWith('video/') && !names.has(f.name)) { next.push(f); names.add(f.name); }
+    }
+    setFiles(next);
   };
+
+  const removeFile = (idx) => setFiles(prev => prev.filter((_, i) => i !== idx));
 
   const handleLabelChange = (e) => {
     const val = e.target.value;
@@ -200,8 +209,6 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
 
   return (
     <div className="upload-block">
-      <h2 className="upload-block__title">{t('batch_upload_title')}</h2>
-
       <div className="upload-settings">
         <div className="upload-settings__field">
           <label className="upload-settings__label">{t('gesture_label_for_all')}:</label>
@@ -233,31 +240,42 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
         </div>
       </div>
 
-      <label className="upload-block__file-label">
-        <IconPlus />
-        {files.length > 0 ? t('change_files') : t('choose_files')}
-        <input
-          type="file"
-          accept="video/mp4,video/webm,video/quicktime"
-          multiple
-          onChange={handleMultipleFilesChange}
-          className="upload-block__file-input"
-        />
-      </label>
+      <div
+        className={`upload-block__dropzone${dragging ? ' upload-block__dropzone--dragging' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(Array.from(e.dataTransfer.files)); }}
+      >
+        <p className="upload-block__dropzone-hint">{t('vib_dropzone_hint')}</p>
+        <label className="upload-block__add-btn">
+          <IconPlus /> {t('vib_add_videos')}
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            multiple
+            onChange={(e) => addFiles(Array.from(e.target.files))}
+            className="upload-block__file-input"
+          />
+        </label>
+      </div>
 
       {files.length > 0 && (
         <div className="upload-grid">
-          <p className="upload-grid__count">{t('files_selected')}: <b>{files.length}</b></p>
+          <div className="upload-grid__actions">
+            <button className="upload-grid__clear-btn" onClick={() => setFiles([])}>Clear all</button>
+            <span className="upload-grid__count">{files.length} video{files.length > 1 ? 's' : ''}</span>
+          </div>
           <div className="upload-grid__list">
             {files.map((file, index) => (
               <SingleVideoProcessor
-                key={index}
+                key={`${file.name}-${index}`}
                 file={file}
                 gestureLabel={globalLabel}
                 sequenceLength={globalSequenceLength}
                 poseModel={poseModel}
                 handModel={handModel}
                 onAddSequence={onAddSequence}
+                onRemove={() => removeFile(index)}
               />
             ))}
           </div>

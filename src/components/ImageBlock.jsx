@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../styles/components/ImageBlock.scss';
 
@@ -9,66 +9,45 @@ const HandLandmarker = MP.HandLandmarker;
 
 import { drawAllLandmarks, hiddenPoseIds } from '../utils/drawing_utils';
 import { exportLandmarksToVector } from '../utils/csv_manager';
+import { IconPlus, IconCheck } from './Icons';
 
-import { IconImage, IconPlus, IconCheck } from './Icons';
 
-const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
+// ============================================================================
+// Single image card
+// ============================================================================
+const SingleImageProcessor = ({ file, gestureLabel, poseModel, handModel, onAddRecord, onRemove }) => {
   const { t } = useTranslation();
   const [imageSrc, setImageSrc] = useState(null);
   const [coordsText, setCoordsText] = useState("");
-  const [gestureLabel, setGestureLabel] = useState(localStorage.getItem("lastLabel") || "");
   const [isAdded, setIsAdded] = useState(false);
   const [results, setResults] = useState(null);
 
   const imgRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  useEffect(() => {
     if (file) {
-      setImageSrc(URL.createObjectURL(file));
-      setCoordsText("");
-      setIsAdded(false);
-      setResults(null);
-      if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext("2d");
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      }
+      const url = URL.createObjectURL(file);
+      setImageSrc(url);
+      return () => URL.revokeObjectURL(url);
     }
-  };
+  }, [file]);
 
   const handleDetect = async () => {
-    if (!poseModel || !handModel || !imgRef.current || !DrawingUtils) {
-      console.error("Models or DrawingUtils not ready");
-      return;
-    }
-
+    if (!poseModel || !handModel || !imgRef.current || !DrawingUtils) return;
     const img = imgRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-
     const drawingUtils = new DrawingUtils(ctx);
-
     const poseResult = await poseModel.detect(img);
     const handResult = await handModel.detect(img);
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawAllLandmarks(
-      drawingUtils,
-      poseResult,
-      handResult,
-      PoseLandmarker.POSE_CONNECTIONS,
-      HandLandmarker.HAND_CONNECTIONS
-    );
-
+    drawAllLandmarks(drawingUtils, poseResult, handResult, PoseLandmarker.POSE_CONNECTIONS, HandLandmarker.HAND_CONNECTIONS);
     setResults({ pose: poseResult, hand: handResult });
-    generateCoordsText(poseResult, handResult);
-  };
+    setIsAdded(false);
 
-  const generateCoordsText = (poseResult, handResult) => {
     let text = "";
     if (poseResult.landmarks?.length > 0) {
       text += "=== POSE ===\n";
@@ -87,7 +66,7 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
     setCoordsText(text);
   };
 
-  const handleAddData = () => {
+  const handleAdd = () => {
     if (!gestureLabel || !results?.pose?.landmarks?.[0]) return;
     localStorage.setItem("lastLabel", gestureLabel);
     const vector = exportLandmarksToVector(results.pose.landmarks[0], results.hand);
@@ -96,52 +75,114 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
   };
 
   return (
-    <div className="image-block">
-      <label className="image-block__file-label">
-        <IconImage />
-        {imageSrc ? t('change_image') : t('choose_image')}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="image-block__file-input"
-        />
-      </label>
+    <div className={`img-processor${isAdded ? ' img-processor--added' : ''}`}>
+      <div className="img-processor__header">
+        <h4 className="img-processor__title">{file.name}</h4>
+        <button className="img-processor__remove-btn" onClick={onRemove} title="Remove">×</button>
+      </div>
 
-      {imageSrc && (
-        <>
-          <div className="image-block__preview" onClick={handleDetect}>
-            <img
-              ref={imgRef}
-              src={imageSrc}
-              alt="Preview"
-              className="image-block__img"
-              crossOrigin="anonymous"
-            />
-            <canvas ref={canvasRef} className="image-block__canvas" />
-          </div>
-          <p className="image-block__hint">{t('click_to_detect')}</p>
-        </>
-      )}
+      <div className="img-processor__preview" onClick={handleDetect}>
+        {imageSrc && (
+          <img ref={imgRef} src={imageSrc} alt={file.name} className="img-processor__img" crossOrigin="anonymous" />
+        )}
+        <canvas ref={canvasRef} className="img-processor__canvas" />
+        {!results && <div className="img-processor__detect-hint">{t('click_to_detect')}</div>}
+      </div>
 
       {coordsText && (
-        <div>
-          <pre className="image-output__coords">{coordsText}</pre>
-          <div className="image-output__controls">
-            <input
-              type="text"
-              placeholder={t('gesture_label_placeholder')}
-              value={gestureLabel}
-              onChange={(e) => setGestureLabel(e.target.value)}
-              className="image-output__label-input"
-            />
-            <button
-              onClick={handleAddData}
-              disabled={isAdded}
-              className={`image-output__add-btn${isAdded ? ' image-output__add-btn--done' : ''}`}
-            >
-              {isAdded ? <><IconCheck /> {t('added_to_csv')}</> : <><IconPlus /> {t('add_to_csv')}</>}
-            </button>
+        <>
+          <pre className="img-processor__coords">{coordsText}</pre>
+          <button
+            onClick={handleAdd}
+            disabled={isAdded || !gestureLabel}
+            className={`img-processor__add-btn${isAdded ? ' img-processor__add-btn--done' : ''}`}
+          >
+            {isAdded ? <><IconCheck /> {t('added_to_csv')}</> : <><IconPlus /> {t('add_to_csv')}</>}
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
+
+// ============================================================================
+// Batch upload container
+// ============================================================================
+const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
+  const { t } = useTranslation();
+  const [files, setFiles] = useState([]);
+  const [dragging, setDragging] = useState(false);
+  const [gestureLabel, setGestureLabel] = useState(localStorage.getItem("lastLabel") || "");
+
+  const addFiles = (incoming) => {
+    const next = [...files];
+    const names = new Set(files.map(f => f.name));
+    for (const f of incoming) {
+      if (f.type.startsWith('image/') && !names.has(f.name)) { next.push(f); names.add(f.name); }
+    }
+    setFiles(next);
+  };
+
+  const removeFile = (idx) => setFiles(prev => prev.filter((_, i) => i !== idx));
+
+  const handleLabelChange = (e) => {
+    setGestureLabel(e.target.value);
+    localStorage.setItem("lastLabel", e.target.value);
+  };
+
+  return (
+    <div className="image-block">
+      <div className="upload-settings">
+        <div className="upload-settings__field">
+          <label className="upload-settings__label">{t('gesture_label_for_all')}:</label>
+          <input
+            type="text"
+            placeholder={t('gesture_label_placeholder')}
+            value={gestureLabel}
+            onChange={handleLabelChange}
+            className="upload-settings__text-input"
+          />
+        </div>
+      </div>
+
+      <div
+        className={`upload-block__dropzone${dragging ? ' upload-block__dropzone--dragging' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(Array.from(e.dataTransfer.files)); }}
+      >
+        <p className="upload-block__dropzone-hint">{t('img_dropzone_hint')}</p>
+        <label className="upload-block__add-btn">
+          <IconPlus /> {t('vib_add_videos')}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => addFiles(Array.from(e.target.files))}
+            className="upload-block__file-input"
+          />
+        </label>
+      </div>
+
+      {files.length > 0 && (
+        <div className="upload-grid">
+          <div className="upload-grid__actions">
+            <button className="upload-grid__clear-btn" onClick={() => setFiles([])}>{t('vib_clear_all')}</button>
+            <span className="upload-grid__count">{files.length} image{files.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="upload-grid__list">
+            {files.map((file, idx) => (
+              <SingleImageProcessor
+                key={`${file.name}-${idx}`}
+                file={file}
+                gestureLabel={gestureLabel}
+                poseModel={poseModel}
+                handModel={handModel}
+                onAddRecord={onAddRecord}
+                onRemove={() => removeFile(idx)}
+              />
+            ))}
           </div>
         </div>
       )}

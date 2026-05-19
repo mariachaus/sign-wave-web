@@ -37,8 +37,8 @@ const LessonController = ({ lessonId, models, onLessonComplete, onLessonFailed, 
       .catch(err => { console.error('Failed to load lesson:', err); setError(err.message); setLoading(false); });
   }, [lessonId, token, i18n.language]);
 
-  const handleError = (gestureId) => {
-    if (gestureId != null) setErrors(prev => [...prev, gestureId]);
+  const handleError = (errorDetail) => {
+    if (errorDetail?.gesture_id != null) setErrors(prev => [...prev, errorDetail]);
     setHearts(prev => {
       const next = prev - 1;
       if (next <= 0) setFailed(true);

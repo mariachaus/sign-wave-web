@@ -7,13 +7,14 @@ import axios from 'axios';
 import ImageBlock from './ImageBlock';
 import WebcamAnalyzer from './WebcamAnalyzer';
 import VideoUploadBlock from './VideoUploadBlock';
+import VideoInferenceBlock from './VideoInferenceBlock';
 import { downloadCSVDataset } from '../utils/csv_manager';
 import { downloadJSONDataset } from '../utils/json_manager';
 import API_BASE_URL from '../config/api';
 import '../styles/pages/MainDashboard.scss';
 
 const MainDashboard = ({ models, isAdmin }) => {
-  const [tab, setTab] = useState(isAdmin ? 'image' : null);
+  const [tab, setTab] = useState(null);
   const [imageDataset, setImageDataset] = useState([]);
   const [videoDataset, setVideoDataset] = useState([]);
   const [streak, setStreak] = useState(null);
@@ -76,25 +77,6 @@ const MainDashboard = ({ models, isAdmin }) => {
       <aside className="dashboard-sidebar">
         <nav className="dashboard-sidebar__nav">
 
-          {isAdmin && (
-            <>
-              <span className="dashboard-sidebar__label">ML Tools</span>
-              <button className={`dashboard-nav-item${tab === 'image' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('image')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                {t('tab_image')}
-              </button>
-              <button className={`dashboard-nav-item${tab === 'webcam' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('webcam')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                {t('tab_webcam')}
-              </button>
-              <button className={`dashboard-nav-item${tab === 'videoData' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('videoData')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><polygon points="10 11 8 13 10 15 10 11"/><line x1="16" y1="13" x2="12" y2="13"/></svg>
-                {t('tab_video_data')}
-              </button>
-              <div className="dashboard-sidebar__divider" />
-            </>
-          )}
-
           <span className="dashboard-sidebar__label">{t('learn')}</span>
           <button className="dashboard-nav-item" onClick={() => navigate('/learn')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
@@ -108,6 +90,29 @@ const MainDashboard = ({ models, isAdmin }) => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M16 2H8a2 2 0 0 0-2 2v2h12V4a2 2 0 0 0-2-2z"/></svg>
             {t('flashcards')}
           </button>
+
+          {isAdmin && (
+            <>
+              <div className="dashboard-sidebar__divider" />
+              <span className="dashboard-sidebar__label">ML Tools</span>
+              <button className={`dashboard-nav-item${tab === 'image' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('image')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                {t('tab_image')}
+              </button>
+              <button className={`dashboard-nav-item${tab === 'webcam' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('webcam')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                {t('tab_webcam')}
+              </button>
+              <button className={`dashboard-nav-item${tab === 'videoData' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('videoData')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><polygon points="10 11 8 13 10 15 10 11"/><line x1="16" y1="13" x2="12" y2="13"/></svg>
+                {t('tab_video_data')}
+              </button>
+              <button className={`dashboard-nav-item${tab === 'inferenceTest' ? ' dashboard-nav-item--active' : ''}`} onClick={() => setTab('inferenceTest')}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Inference Test
+              </button>
+            </>
+          )}
 
           <div className="dashboard-sidebar__bottom">
             <button className="dashboard-nav-item" onClick={() => navigate('/profile')}>
@@ -229,13 +234,11 @@ const MainDashboard = ({ models, isAdmin }) => {
         {tab === 'image' && (
           <div className="dashboard-content image-mode">
             <h1>{t('image_detection')}</h1>
-            <div className="upload-grid">
-              <ImageBlock
-                poseModel={models.image.pose}
-                handModel={models.image.hand}
-                onAddRecord={(r) => setImageDataset(prev => [...prev, r])}
-              />
-            </div>
+            <ImageBlock
+              poseModel={models.image.pose}
+              handModel={models.image.hand}
+              onAddRecord={(r) => setImageDataset(prev => [...prev, r])}
+            />
             <button className="download-btn" onClick={() => downloadCSVDataset(imageDataset)}>
               <IconDownload /> {t('download_csv')}
             </button>
@@ -260,6 +263,16 @@ const MainDashboard = ({ models, isAdmin }) => {
             <button className="download-btn" onClick={() => downloadJSONDataset(videoDataset)}>
               <IconDownload /> {t('download_json')}{videoDataset.length > 0 && ` (${videoDataset.length})`}
             </button>
+          </div>
+        )}
+
+        {tab === 'inferenceTest' && (
+          <div className="dashboard-content">
+            <h1>Video Inference Test</h1>
+            <VideoInferenceBlock
+              poseModel={models.video.pose}
+              handModel={models.video.hand}
+            />
           </div>
         )}
       </section>}

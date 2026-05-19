@@ -1,43 +1,76 @@
+/* ── Image Block container ────────────────────────────────────── */
 .image-block {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-sm);
+}
 
-  &__file-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    padding: 8px 18px;
-    background: var(--color-surface-alt);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-radius: 99px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background var(--transition), border-color var(--transition);
+/* reuse shared upload-settings, upload-block__dropzone, upload-grid from VideoUploadBlock.scss */
 
-    &:hover { background: var(--color-border); }
+/* ── Single Image Processor Card ──────────────────────────────── */
+.img-processor {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+
+  &--added {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 3px var(--color-success-light);
   }
 
-  &__file-input { display: none; }
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    word-break: break-all;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  &__remove-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 3px 8px;
+    font-size: 0.875rem;
+    line-height: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+
+    &:hover { color: var(--color-danger); border-color: var(--color-danger); }
+  }
 
   &__preview {
     position: relative;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     background: #000;
-    margin-bottom: 16px;
     cursor: pointer;
   }
 
   &__img {
     width: 100%;
     display: block;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
   }
 
   &__canvas {
@@ -48,58 +81,39 @@
     pointer-events: none;
   }
 
-  &__hint {
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-    text-align: center;
-    margin: -8px 0 12px;
+  &__detect-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.25);
+    pointer-events: none;
   }
-}
 
-.image-output {
   &__coords {
-    height: 150px;
+    height: 100px;
     overflow-y: auto;
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     font-family: monospace;
-    background: var(--color-surface-alt);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    padding: 8px 10px;
-    margin-bottom: 12px;
+    padding: 6px 8px;
     color: var(--color-text-muted);
     scrollbar-width: thin;
-  }
-
-  &__controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  &__label-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-family: inherit;
-    background: var(--color-surface);
-    color: var(--color-text);
-    transition: border-color var(--transition), box-shadow var(--transition);
-
-    &:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px var(--color-primary-light);
-    }
+    margin: 0;
   }
 
   &__add-btn {
+    width: 100%;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 8px 12px;
     background: var(--color-success);
     color: #fff;
     border: none;
@@ -108,10 +122,10 @@
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    white-space: nowrap;
     transition: opacity var(--transition);
 
     &:hover:not(:disabled) { opacity: 0.85; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
 
     &--done {
       background: var(--color-text-subtle);
