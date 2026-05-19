@@ -138,6 +138,7 @@ i18n
           "no_description": "No description available.",
           "practice_now": "Practice now",
           "similar_gestures": "Similar gestures",
+          "search_gestures": "Search gestures...",
 
           // Learn / Levels
           "learn": "Learn",
@@ -450,6 +451,7 @@ i18n
           "no_description": "Опис відсутній.",
           "practice_now": "Практикувати зараз",
           "similar_gestures": "Схожі жести",
+          "search_gestures": "Пошук жестів...",
 
           // Learn / Levels
           "learn": "Навчання",

@@ -101,6 +101,25 @@ em { font-weight: bold; }
 button { font-family: inherit; cursor: pointer; }
 a { text-decoration: none; }
 
+/* ===== SEARCH WRAP ===== */
+.search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  input { padding-left: 32px; }
+}
+
 /* ===== SHARED PAGE HEADER ===== */
 .page-header {
   display: flex;

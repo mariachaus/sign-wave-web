@@ -6,6 +6,37 @@
 }
 
 
+.gestures-page .search-wrap {
+  margin-bottom: 28px;
+}
+
+.gestures-search {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  width: 280px;
+
+  &::placeholder { color: var(--color-text-muted); }
+  &:focus { outline: none; border-color: var(--color-primary); }
+}
+
+.gestures-search__count {
+  margin: -16px 0 20px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.gestures-search__empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  margin-top: 48px;
+  font-size: 0.9375rem;
+}
+
 .gesture-section {
   margin-bottom: 24px;
 

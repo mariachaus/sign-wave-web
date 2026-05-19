@@ -10,13 +10,13 @@ const GestureCard = ({ gesture, isActive }) => {
       className={`gesture-card ${isActive ? 'active' : ''}`}
       onClick={() => navigate(`/gestures/${gesture.id}`)}
     >
-      <h3 className="gesture-card__name">{gesture.name}</h3>
       <div className="gesture-card__thumb">
         {gesture.thumbnail_url
           ? <img src={gesture.thumbnail_url} alt={gesture.name} />
           : <div />
         }
       </div>
+      <h3 className="gesture-card__name">{gesture.name}</h3>
     </div>
   );
 };

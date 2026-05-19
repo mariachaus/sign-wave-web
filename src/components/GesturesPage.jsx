@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GestureCard from './GestureCard';
+import { IconSearch } from './Icons';
 import API_BASE_URL from "../config/api";
 import { useTranslation } from 'react-i18next';
 import '../styles/pages/GesturesPage.scss';
@@ -12,6 +13,7 @@ const GesturesPage = () => {
   const [categoryDescriptions, setCategoryDescriptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [collapsedCategories, setCollapsedCategories] = useState({});
+  const [query, setQuery] = useState('');
   
   useEffect(() => {
     setLoading(true);
@@ -34,7 +36,12 @@ const GesturesPage = () => {
     setCollapsedCategories(prev => ({ ...prev, [categoryName]: !prev[categoryName] }));
   };
 
-  const groupedGestures = gestures.reduce((acc, gesture) => {
+  const trimmed = query.trim().toLowerCase();
+  const filteredGestures = trimmed
+    ? gestures.filter(g => g.name.toLowerCase().includes(trimmed))
+    : gestures;
+
+  const groupedGestures = filteredGestures.reduce((acc, gesture) => {
     const keys = gesture.categories?.length > 0 ? gesture.categories : [t('other')];
     keys.forEach(k => { if (!acc[k]) acc[k] = []; acc[k].push(gesture); });
     return acc;
@@ -54,7 +61,28 @@ const GesturesPage = () => {
         <h2 className="page-header__title">{t('library_of_gestures')}</h2>
       </div>
 
-      {Object.keys(groupedGestures).map((category) => {
+      <div className="search-wrap">
+        <IconSearch />
+        <input
+          className="gestures-search"
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder={t('search_gestures') || 'Пошук жестів…'}
+        />
+      </div>
+
+      {trimmed && (
+        <p className="gestures-search__count">
+          {filteredGestures.length} {t('gestures_count', { count: filteredGestures.length })}
+        </p>
+      )}
+
+      {trimmed ? (
+        filteredGestures.length > 0
+          ? <div className="gesture-section__grid">{filteredGestures.map(g => <GestureCard key={g.id} gesture={g} />)}</div>
+          : <p className="gestures-search__empty">{t('no_results') || 'Нічого не знайдено'}</p>
+      ) : Object.keys(groupedGestures).map((category) => {
         const isCollapsed = collapsedCategories[category];
         return (
           <section key={category} className="gesture-section">

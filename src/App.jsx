@@ -22,6 +22,16 @@ import axios from 'axios';
 import ErrorBoundary from './components/ErrorBoundary';
 import './styles/global.scss';
 
+const PrivateRoute = ({ children, token, isLoaded }) => {
+  if (!token) return <Navigate to="/auth" />;
+  if (!isLoaded) return (
+    <div className="loading-container">
+      <p>Loading models and data... Please wait</p>
+    </div>
+  );
+  return children;
+};
+
 function App() {
   const { t, i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -104,16 +114,6 @@ function App() {
     initModels();
   }, [token, i18n]); // Додано i18n у залежності
 
-  const PrivateRoute = ({ children }) => {
-    if (!token) return <Navigate to="/auth" />;
-    if (!isLoaded) return (
-      <div className="loading-container">
-        <p>Loading models and data... Please wait</p>
-      </div>
-    );
-    return children;
-  };
-
   const AppHeader = () => {
     const location = useLocation();
     if (!token || location.pathname === '/terms') return null;
@@ -143,18 +143,18 @@ function App() {
         <ErrorBoundary>
         <Routes>
           <Route path="/auth" element={!token ? <AuthPage onLoginSuccess={(t) => setToken(t)} /> : <Navigate to="/" />} />
-          <Route path="/" element={<PrivateRoute><MainDashboard models={models} isAdmin={isAdmin} /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-          <Route path="/settings" element={<PrivateRoute><SettingsPage models={models} /></PrivateRoute>} />
+          <Route path="/" element={<PrivateRoute token={token} isLoaded={isLoaded}><MainDashboard models={models} isAdmin={isAdmin} /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute token={token} isLoaded={isLoaded}><ProfilePage /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute token={token} isLoaded={isLoaded}><SettingsPage models={models} /></PrivateRoute>} />
           
-          <Route path="/gestures" element={<PrivateRoute><GesturesPage /></PrivateRoute>} />
-          <Route path="/gestures/:id" element={<PrivateRoute><GestureDetailsPage /></PrivateRoute>} />
-          <Route path="/learn" element={<PrivateRoute><LevelsPage /></PrivateRoute>} />
-          <Route path="/lesson/:id" element={<PrivateRoute><LessonPage models={models} /></PrivateRoute>} />
-          <Route path="/practice/:gestureId" element={<PrivateRoute><PracticePage models={models} /></PrivateRoute>} />
-          <Route path="/achievements" element={<PrivateRoute><AchievementsPage /></PrivateRoute>} />
-          <Route path="/flashcards" element={<PrivateRoute><FlashcardsPage /></PrivateRoute>} />
-          <Route path="/admin" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
+          <Route path="/gestures" element={<PrivateRoute token={token} isLoaded={isLoaded}><GesturesPage /></PrivateRoute>} />
+          <Route path="/gestures/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><GestureDetailsPage /></PrivateRoute>} />
+          <Route path="/learn" element={<PrivateRoute token={token} isLoaded={isLoaded}><LevelsPage /></PrivateRoute>} />
+          <Route path="/lesson/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><LessonPage models={models} /></PrivateRoute>} />
+          <Route path="/practice/:gestureId" element={<PrivateRoute token={token} isLoaded={isLoaded}><PracticePage models={models} /></PrivateRoute>} />
+          <Route path="/achievements" element={<PrivateRoute token={token} isLoaded={isLoaded}><AchievementsPage /></PrivateRoute>} />
+          <Route path="/flashcards" element={<PrivateRoute token={token} isLoaded={isLoaded}><FlashcardsPage /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute token={token} isLoaded={isLoaded}><AdminPage /></PrivateRoute>} />
           
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />

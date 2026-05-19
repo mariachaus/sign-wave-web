@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API, headers, useDebounce } from './adminUtils';
+import { IconSearch } from '../Icons';
 
 const PAGE_SIZE = 25;
 
@@ -154,12 +155,15 @@ const AdminLessonsTab = () => {
     <div className="admin-section">
       {errorMsg && <div className="admin-error" onClick={() => setErrorMsg('')}>{errorMsg} &times;</div>}
       <div className="admin-toolbar">
-        <input
-          className="admin-search"
-          placeholder={t('admin_search_lessons')}
-          value={lessonSearch}
-          onChange={e => { setLessonSearch(e.target.value); setLessonPage(0); }}
-        />
+        <div className="search-wrap">
+          <IconSearch />
+          <input
+            className="admin-search"
+            placeholder={t('admin_search_lessons')}
+            value={lessonSearch}
+            onChange={e => { setLessonSearch(e.target.value); setLessonPage(0); }}
+          />
+        </div>
         <select className="admin-filter" value={levelFilter}
           onChange={e => { setLevelFilter(e.target.value); setLessonPage(0); }}>
           <option value="">{t('admin_filter_all_levels')}</option>
@@ -396,7 +400,8 @@ const AdminLessonsTab = () => {
                               )
                             }
                             <div className="admin-pool-add">
-                              <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
+                              <div className="search-wrap" style={{ flex: '1', minWidth: '200px' }}>
+                                <IconSearch />
                                 <input
                                   className="admin-search admin-search--white"
                                   style={{ width: '100%' }}

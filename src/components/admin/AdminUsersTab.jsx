@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { API, headers, useDebounce } from './adminUtils';
+import { IconSearch } from '../Icons';
 
 const PAGE_SIZE = 25;
 
@@ -43,12 +44,15 @@ const AdminUsersTab = () => {
     <div className="admin-section">
       {errorMsg && <div className="admin-error" onClick={() => setErrorMsg('')}>{errorMsg} &times;</div>}
       <div className="admin-toolbar">
-        <input
-          className="admin-search"
-          placeholder={t('admin_search_users')}
-          value={search}
-          onChange={e => { setSearch(e.target.value); setPage(0); }}
-        />
+        <div className="search-wrap">
+          <IconSearch />
+          <input
+            className="admin-search"
+            placeholder={t('admin_search_users')}
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0); }}
+          />
+        </div>
         <select className="admin-filter" value={role}
           onChange={e => { setRole(e.target.value); setPage(0); }}>
           <option value="">{t('admin_filter_all_roles')}</option>

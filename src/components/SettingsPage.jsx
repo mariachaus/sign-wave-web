@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import API_BASE_URL from "../config/api";
 import WebcamAnalyzer from './WebcamAnalyzer';
 import ConfirmModal from './ConfirmModal';
+import { IconUser, IconGlobe, IconMoon, IconMail, IconCamera, IconTextSize } from './Icons';
 import { applyTheme, applyFontSize } from '../utils/theme';
 import '../styles/pages/SettingsPage.scss';
 
@@ -39,6 +40,7 @@ const SettingsPage = ({ models }) => {
   const togglePw = (field) => setShowPasswords(p => ({ ...p, [field]: !p[field] }));
 
   const [profileData, setProfileData] = useState({ username: '', email: '' });
+  const [originalProfile, setOriginalProfile] = useState({ username: '', email: '' });
   const [originalEmail, setOriginalEmail] = useState('');
   const [showEmailConfirm, setShowEmailConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -54,6 +56,7 @@ const SettingsPage = ({ models }) => {
     connection_color: localStorage.getItem('connection_color') || '#FF0000',
     is_mirror_view: localStorage.getItem('mirror_view') !== 'false',
   });
+  const [originalUiSettings, setOriginalUiSettings] = useState(null);
 
   const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -66,11 +69,12 @@ const SettingsPage = ({ models }) => {
         });
         if (res.data.profile) {
           setProfileData({ username: res.data.profile.username, email: res.data.profile.email });
+          setOriginalProfile({ username: res.data.profile.username, email: res.data.profile.email });
           setOriginalEmail(res.data.profile.email);
         }
         if (res.data.ui) {
           const ui = res.data.ui;
-          setUiSettings({
+          const loadedUi = {
             theme: ui.theme,
             language: ui.language || 'uk',
             font_size: ui.font_size,
@@ -79,7 +83,9 @@ const SettingsPage = ({ models }) => {
             landmark_color: ui.landmark_color,
             connection_color: ui.connection_color || '#FF0000',
             is_mirror_view: ui.is_mirror_view_enabled,
-          });
+          };
+          setUiSettings(loadedUi);
+          setOriginalUiSettings(loadedUi);
           syncLocalData(ui);
           if (ui.language && ui.language !== i18n.language) i18n.changeLanguage(ui.language);
         }
@@ -126,6 +132,7 @@ const SettingsPage = ({ models }) => {
       applyFontSize(uiSettings.font_size);
       showStatus(t('status_settings_saved'), 'success');
       syncLocalData(dataToSave);
+      setOriginalUiSettings({ ...uiSettings });
     } catch (err) {
       showStatus(err.response?.data?.error || "UI update failed", 'error');
     }
@@ -142,6 +149,14 @@ const SettingsPage = ({ models }) => {
     } catch (err) {
       showStatus(err.response?.data?.error || "Update failed", 'error');
     }
+  };
+
+  const handleCancelProfile = () => {
+    setProfileData(originalProfile);
+  };
+
+  const handleCancelVideo = () => {
+    if (originalUiSettings) setUiSettings(originalUiSettings);
   };
 
   const handleUpdateProfile = () => {
@@ -220,11 +235,12 @@ const SettingsPage = ({ models }) => {
       {activeTab === 'main' && !showPreview && (
         <div className="settings-menu">
           <div className="menu-item" onClick={() => setActiveTab('personal')}>
-            {t('personal_info')} <span>➜</span>
+            <span className="menu-item__left"><IconUser size={18} />{t('personal_info')}</span>
+            <span>➜</span>
           </div>
 
           <div className="menu-item">
-            {t('language')}
+            <span className="menu-item__left"><IconGlobe size={18} />{t('language')}</span>
             <select value={uiSettings.language} onChange={(e) => handleLanguageChange(e.target.value)}>
               <option value="uk">Українська</option>
               <option value="en">English</option>
@@ -232,7 +248,7 @@ const SettingsPage = ({ models }) => {
           </div>
 
           <div className="menu-item">
-            {t('dark_mode')}
+            <span className="menu-item__left"><IconMoon size={18} />{t('dark_mode')}</span>
             <Toggle
               checked={uiSettings.theme === 'dark'}
               onChange={(e) => {
@@ -243,21 +259,33 @@ const SettingsPage = ({ models }) => {
             />
           </div>
 
-          <div className="menu-item">
-            {t('text_size')}
-            <select value={uiSettings.font_size} onChange={(e) => setUiSettings({ ...uiSettings, font_size: parseFloat(e.target.value) })}>
-              <option value="0.8">{t('small')}</option>
-              <option value="1">{t('medium')}</option>
-              <option value="1.2">{t('large')}</option>
-            </select>
+          <div className="font-size-picker">
+            <span className="menu-item__left font-size-picker__title"><IconTextSize size={18} />{t('text_size')}</span>
+            <div className="font-size-picker__options">
+              {[
+                { value: 0.8, label: t('small'),   letterSize: '14px' },
+                { value: 1.0, label: t('medium'),  letterSize: '20px' },
+                { value: 1.2, label: t('large'),   letterSize: '26px' },
+              ].map(({ value, label, letterSize }) => (
+                <button
+                  key={value}
+                  className={`font-size-picker__btn${uiSettings.font_size === value ? ' font-size-picker__btn--active' : ''}`}
+                  onClick={() => setUiSettings({ ...uiSettings, font_size: value })}
+                >
+                  <span className="font-size-picker__letter" style={{ fontSize: letterSize }}>A</span>
+                  <span className="font-size-picker__label">{label}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="menu-item" onClick={() => setActiveTab('video')}>
-            {t('video_settings')} <span>➜</span>
+            <span className="menu-item__left"><IconCamera size={18} />{t('video_settings')}</span>
+            <span>➜</span>
           </div>
 
           <div className="menu-item">
-            {t('email_subscription')}
+            <span className="menu-item__left"><IconMail size={18} />{t('email_subscription')}</span>
             <Toggle
               checked={uiSettings.email_notifications}
               onChange={(e) => setUiSettings({ ...uiSettings, email_notifications: e.target.checked })}
@@ -287,7 +315,10 @@ const SettingsPage = ({ models }) => {
             {t('change_password')}
           </button>
 
-          <button className="save-btn" onClick={handleUpdateProfile}>{t('save_profile')}</button>
+          <div className="settings-btn-row">
+            <button className="save-btn" onClick={handleUpdateProfile}>{t('save_profile')}</button>
+            <button className="save-btn secondary" onClick={handleCancelProfile}>{t('cancel')}</button>
+          </div>
           <button className="save-btn danger" onClick={handleDeleteAccount}>{t('delete_account')}</button>
         </div>
       )}
@@ -338,7 +369,10 @@ const SettingsPage = ({ models }) => {
             <Toggle checked={uiSettings.is_mirror_view} onChange={(e) => setUiSettings({ ...uiSettings, is_mirror_view: e.target.checked })} />
           </div>
 
-          <button className="save-btn" onClick={handleUpdateUI}>{t('save_video')}</button>
+          <div className="settings-btn-row">
+            <button className="save-btn" onClick={handleUpdateUI}>{t('save_video')}</button>
+            <button className="save-btn secondary" onClick={handleCancelVideo}>{t('cancel')}</button>
+          </div>
           <button className="save-btn secondary" onClick={() => setShowPreview(true)}>{t('test_camera')}</button>
         </div>
       )}
