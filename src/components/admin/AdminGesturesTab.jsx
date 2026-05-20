@@ -21,7 +21,10 @@ const AdminGesturesTab = () => {
   const [editFields, setEditFields] = useState({
     video_url: '', illustration_url: '', thumbnail_url: '',
     name_uk: '', name_en: '', description_uk: '', description_en: '',
+    is_dynamic: false,
   });
+  const [synonyms, setSynonyms] = useState([]);
+  const [newSynonym, setNewSynonym] = useState({ name: '', language_code: 'uk' });
   const [showForm, setShowForm] = useState(false);
   const [newGesture, setNewGesture] = useState({
     name_uk: '', name_en: '', description_uk: '', description_en: '',
@@ -60,14 +63,30 @@ const AdminGesturesTab = () => {
       }).catch(fail);
   };
 
+  const loadSynonyms = (id) =>
+    axios.get(`${API}/api/admin/gestures/${id}/synonyms`, { headers: headers() })
+      .then(res => setSynonyms(res.data)).catch(() => {});
+
+  const addSynonym = (gestureId) => {
+    if (!newSynonym.name.trim()) return;
+    axios.post(`${API}/api/admin/gestures/${gestureId}/synonyms`, newSynonym, { headers: headers() })
+      .then(() => { loadSynonyms(gestureId); setNewSynonym({ name: '', language_code: 'uk' }); })
+      .catch(fail);
+  };
+
+  const removeSynonym = (gestureId, synId) =>
+    axios.delete(`${API}/api/admin/gestures/${gestureId}/synonyms/${synId}`, { headers: headers() })
+      .then(() => loadSynonyms(gestureId)).catch(fail);
+
   const startEdit = (g) => {
     setEditingId(g.id);
     setEditFields({
       video_url: g.video_url || '', illustration_url: g.illustration_url || '',
       thumbnail_url: g.thumbnail_url || '', name_uk: g.name_uk || '',
       name_en: g.name_en || '', description_uk: g.description_uk || '',
-      description_en: g.description_en || '',
+      description_en: g.description_en || '', is_dynamic: g.is_dynamic,
     });
+    loadSynonyms(g.id);
   };
 
   const saveEdit = (id) =>
@@ -197,10 +216,6 @@ const AdminGesturesTab = () => {
                         onClick={() => patch(g.id, { is_active: !g.is_active })}>
                         {g.is_active ? t('admin_deactivate') : t('admin_activate')}
                       </button>
-                      <button className="admin-btn admin-btn--sm"
-                        onClick={() => patch(g.id, { is_dynamic: !g.is_dynamic })}>
-                        {g.is_dynamic ? t('admin_make_static') : t('admin_make_dynamic')}
-                      </button>
                       <button className={`admin-btn admin-btn--sm${editingId === g.id ? ' admin-btn--active' : ''}`}
                         onClick={() => editingId === g.id ? setEditingId(null) : startEdit(g)}>
                         {editingId === g.id ? t('admin_cancel') : t('edit')}
@@ -256,7 +271,52 @@ const AdminGesturesTab = () => {
                           <input type="text" value={editFields.thumbnail_url} placeholder="https://…"
                             onChange={e => setEditFields(p => ({ ...p, thumbnail_url: e.target.value }))} />
                         </label>
+                        <label style={{ gap: '6px' }}>
+                          <input type="checkbox" checked={editFields.is_dynamic}
+                            onChange={e => setEditFields(p => ({ ...p, is_dynamic: e.target.checked }))} />
+                          {t('admin_col_dynamic')}
+                        </label>
                         <button className="admin-btn admin-btn--primary" onClick={() => saveEdit(g.id)}>{t('admin_save')}</button>
+
+                        <div className="admin-synonyms">
+                          <div className="admin-synonyms__title">Синоніми</div>
+                          <div className="admin-synonyms__list">
+                            {synonyms.length === 0 && (
+                              <span className="admin-table__secondary">—</span>
+                            )}
+                            {synonyms.map(s => (
+                              <span key={s.id} className="admin-synonym-tag">
+                                <span className="admin-synonym-tag__lang">{s.language_code}</span>
+                                {s.name}
+                                <button
+                                  className="admin-synonym-tag__remove"
+                                  onClick={() => removeSynonym(g.id, s.id)}
+                                  aria-label="Remove"
+                                >&times;</button>
+                              </span>
+                            ))}
+                          </div>
+                          <div className="admin-synonyms__add">
+                            <select
+                              className="admin-filter"
+                              value={newSynonym.language_code}
+                              onChange={e => setNewSynonym(p => ({ ...p, language_code: e.target.value }))}
+                            >
+                              <option value="uk">uk</option>
+                              <option value="en">en</option>
+                            </select>
+                            <input
+                              className="admin-search"
+                              placeholder="Новий синонім…"
+                              value={newSynonym.name}
+                              onChange={e => setNewSynonym(p => ({ ...p, name: e.target.value }))}
+                              onKeyDown={e => e.key === 'Enter' && addSynonym(g.id)}
+                            />
+                            <button className="admin-btn admin-btn--sm" onClick={() => addSynonym(g.id)}>
+                              <IconPlus size={24} color="var(--color-primary)" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </td>
                   </tr>

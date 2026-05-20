@@ -306,6 +306,72 @@
   padding: 12px 16px;
 }
 
+.admin-synonyms {
+  width: 100%;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+
+  &__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    min-height: 28px;
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .admin-filter { width: 70px; flex-shrink: 0; }
+    .admin-search { flex: 1; }
+  }
+}
+
+.admin-synonym-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 99px;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+
+  &__lang {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+  }
+
+  &__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 0;
+    padding: 0 0 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover { color: var(--color-danger); }
+  }
+}
+
 .admin-url-form {
   display: flex;
   align-items: flex-start;
