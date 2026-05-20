@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGoogleLogin } from '@react-oauth/google';
 import API_BASE_URL from '../config/api';
@@ -207,6 +207,14 @@ const AuthPage = ({ onLoginSuccess }) => {
               </button>
             </div>
           </div>
+
+          {isLogin && (
+            <div className="auth-forgot">
+              <Link to="/forgot-password" className="auth-forgot__link">
+                {t('forgot_password')}
+              </Link>
+            </div>
+          )}
 
           {!isLogin && (
             <label className="auth-terms-check">

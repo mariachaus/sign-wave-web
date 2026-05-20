@@ -15,6 +15,8 @@ import AchievementsPage from './components/AchievementsPage';
 import AdminPage from './components/AdminPage';
 import TermsPage from './components/TermsPage';
 import FlashcardsPage from './components/FlashcardsPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import API_BASE_URL from "./config/api";
 import { applyTheme, applyFontSize } from './utils/theme';
 
@@ -157,6 +159,8 @@ function App() {
           <Route path="/admin" element={<PrivateRoute token={token} isLoaded={isLoaded}><AdminPage /></PrivateRoute>} />
           
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>
         </ErrorBoundary>

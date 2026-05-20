@@ -316,6 +316,22 @@ i18n
           // Levels overall progress
           "overall_progress": "Overall Progress",
           "lessons_completed": "lessons completed",
+
+          // Forgot / Reset password
+          "forgot_password": "Forgot password?",
+          "forgot_password_title": "Reset password",
+          "forgot_password_sub": "Enter your email and we'll send you a reset link",
+          "forgot_password_btn": "Send reset link",
+          "forgot_password_sent": "If this email is registered, you'll receive a reset link within a minute.",
+          "forgot_password_back": "Back to sign in",
+          "reset_password_title": "New password",
+          "reset_password_sub": "Enter a new password for your account",
+          "reset_password_btn": "Set new password",
+          "reset_password_success": "Password updated! You can now sign in.",
+          "reset_password_invalid": "This link is invalid or has expired.",
+          "confirm_password_label": "Confirm new password",
+          "resetting": "Updating…",
+          "sending": "Sending…",
         }
       },
       uk: {
@@ -628,6 +644,22 @@ i18n
           // Levels overall progress
           "overall_progress": "Загальний прогрес",
           "lessons_completed": "уроків пройдено",
+
+          // Forgot / Reset password
+          "forgot_password": "Забули пароль?",
+          "forgot_password_title": "Відновлення паролю",
+          "forgot_password_sub": "Введіть пошту — надішлемо посилання для скидання",
+          "forgot_password_btn": "Надіслати посилання",
+          "forgot_password_sent": "Якщо ця пошта зареєстрована, ви отримаєте листа протягом хвилини.",
+          "forgot_password_back": "Повернутися до входу",
+          "reset_password_title": "Новий пароль",
+          "reset_password_sub": "Введіть новий пароль для вашого акаунту",
+          "reset_password_btn": "Встановити пароль",
+          "reset_password_success": "Пароль оновлено! Тепер можна увійти.",
+          "reset_password_invalid": "Це посилання недійсне або застаріло.",
+          "confirm_password_label": "Підтвердіть новий пароль",
+          "resetting": "Оновлення…",
+          "sending": "Надсилання…",
         }
       }
     },

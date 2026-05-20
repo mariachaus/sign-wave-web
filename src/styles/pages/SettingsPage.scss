@@ -146,13 +146,16 @@
 .settings-pw-wrap {
   position: relative;
   margin-top: 15px;
-  .settings-input { padding-right: 42px; }
+  .settings-input {
+    padding-right: 42px;
+    margin-top: 0;
+  }
 }
 
 .settings-pw-toggle {
   position: absolute;
   right: 10px;
-  top: 55%;
+  top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;

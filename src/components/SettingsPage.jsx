@@ -36,8 +36,7 @@ const SettingsPage = ({ models }) => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState(location.state?.tab ?? 'main');
   const [showPreview, setShowPreview] = useState(false);
-  const [showPasswords, setShowPasswords] = useState({ old: false, new: false, confirm: false });
-  const togglePw = (field) => setShowPasswords(p => ({ ...p, [field]: !p[field] }));
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const [profileData, setProfileData] = useState({ username: '', email: '' });
   const [originalProfile, setOriginalProfile] = useState({ username: '', email: '' });
@@ -327,22 +326,28 @@ const SettingsPage = ({ models }) => {
       {activeTab === 'password' && (
         <div className="settings-form">
           {[
-            { field: 'old',     placeholder: t('old_password'),     key: 'old_password' },
-            { field: 'new',     placeholder: t('new_password'),     key: 'new_password' },
-            { field: 'confirm', placeholder: t('confirm_password'), key: 'confirm_password' },
-          ].map(({ field, placeholder, key }) => (
-            <div key={field} className="settings-pw-wrap">
+            { placeholder: t('old_password'),     key: 'old_password',     isFirst: true },
+            { placeholder: t('new_password'),     key: 'new_password',     isFirst: false },
+            { placeholder: t('confirm_password'), key: 'confirm_password', isFirst: false },
+          ].map(({ placeholder, key, isFirst }) => (
+            <div key={key} className="settings-pw-wrap">
               <input
                 className="settings-input"
-                type={showPasswords[field] ? 'text' : 'password'}
+                type={showPasswords ? 'text' : 'password'}
                 placeholder={placeholder}
                 value={passwordData[key]}
                 onChange={(e) => setPasswordData({ ...passwordData, [key]: e.target.value })}
               />
-              <button type="button" className="settings-pw-toggle" onClick={() => togglePw(field)}
-                aria-label={showPasswords[field] ? 'Hide password' : 'Show password'}>
-                {showPasswords[field] ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
+              {isFirst && (
+                <button
+                  type="button"
+                  className="settings-pw-toggle"
+                  onClick={() => setShowPasswords(v => !v)}
+                  aria-label={showPasswords ? 'Hide passwords' : 'Show passwords'}
+                >
+                  {showPasswords ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
+              )}
             </div>
           ))}
           <button className="save-btn" onClick={handleChangePassword}>{t('save_password')}</button>
