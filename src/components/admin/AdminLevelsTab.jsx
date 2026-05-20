@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { API, headers } from './adminUtils';
+import { IconPlus } from '../Icons';
 
 const AdminLevelsTab = () => {
   const { t } = useTranslation();
@@ -50,7 +51,7 @@ const AdminLevelsTab = () => {
       {errorMsg && <div className="admin-error" onClick={() => setErrorMsg('')}>{errorMsg} &times;</div>}
       <div className="admin-toolbar">
         <button className="admin-btn" onClick={() => setShowForm(v => !v)}>
-          {showForm ? t('admin_cancel') : t('admin_new_level')}
+          {showForm ? t('admin_cancel') : <><IconPlus /> {t('admin_new_level')}</>}
         </button>
         <span className="admin-total">{levels.length} total</span>
       </div>

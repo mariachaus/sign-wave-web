@@ -253,7 +253,7 @@ i18n
           "admin_label_video_url": "Video URL",
           "admin_label_illustration_url": "Illustration URL",
           "admin_label_thumbnail_url": "Thumbnail URL",
-          "admin_new_template": "+ New template",
+          "admin_new_template": "New template",
           "admin_create": "Create",
           "admin_disable": "Disable",
           "admin_enable": "Enable",
@@ -262,7 +262,7 @@ i18n
           "admin_confirm_delete_user": "Delete user \"{{name}}\"? This cannot be undone.",
           "admin_confirm_delete_template": "Delete this template?",
           "admin_confirm_delete_gesture": "Delete gesture \"{{name}}\"? This cannot be undone.",
-          "admin_new_gesture": "+ New gesture",
+          "admin_new_gesture": "New gesture",
           "admin_col_name": "Name (EN)",
           "admin_col_model_label_req": "Model label *",
           "admin_col_video_url_req": "Video URL *",
@@ -281,13 +281,13 @@ i18n
 
           // Admin levels
           "admin_tab_levels": "Levels",
-          "admin_new_level": "+ New level",
+          "admin_new_level": "New level",
           "admin_confirm_delete_level": "Delete level \"{{name}}\"? All its lessons will lose their level.",
 
           // Admin lessons
           "admin_tab_lessons": "Lessons",
           "admin_search_lessons": "Search by name…",
-          "admin_new_lesson": "+ New lesson",
+          "admin_new_lesson": "New lesson",
           "admin_col_level": "Level",
           "admin_col_order": "Order",
           "admin_confirm_delete_lesson": "Delete lesson \"{{name}}\"? This cannot be undone.",
@@ -581,7 +581,7 @@ i18n
           "admin_label_video_url": "Відео URL",
           "admin_label_illustration_url": "Ілюстрація URL",
           "admin_label_thumbnail_url": "Мініатюра URL",
-          "admin_new_template": "+ Новий шаблон",
+          "admin_new_template": "Новий шаблон",
           "admin_create": "Створити",
           "admin_disable": "Вимкнути",
           "admin_enable": "Увімкнути",
@@ -590,7 +590,7 @@ i18n
           "admin_confirm_delete_user": "Видалити користувача \"{{name}}\"? Цю дію неможливо скасувати.",
           "admin_confirm_delete_template": "Видалити цей шаблон?",
           "admin_confirm_delete_gesture": "Видалити жест \"{{name}}\"? Цю дію неможливо скасувати.",
-          "admin_new_gesture": "+ Новий жест",
+          "admin_new_gesture": "Новий жест",
           "admin_col_name": "Назва (EN)",
           "admin_col_model_label_req": "Мітка моделі *",
           "admin_col_video_url_req": "Відео URL *",
@@ -609,13 +609,13 @@ i18n
 
           // Admin levels
           "admin_tab_levels": "Рівні",
-          "admin_new_level": "+ Новий рівень",
+          "admin_new_level": "Новий рівень",
           "admin_confirm_delete_level": "Видалити рівень \"{{name}}\"? Всі його уроки втратять рівень.",
 
           // Admin lessons
           "admin_tab_lessons": "Уроки",
           "admin_search_lessons": "Пошук за назвою…",
-          "admin_new_lesson": "+ Новий урок",
+          "admin_new_lesson": "Новий урок",
           "admin_col_level": "Рівень",
           "admin_col_order": "Порядок",
           "admin_confirm_delete_lesson": "Видалити урок \"{{name}}\"? Цю дію неможливо скасувати.",

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { API, headers, useDebounce } from './adminUtils';
-import { IconSearch } from '../Icons';
+import { IconSearch, IconPlus } from '../Icons';
 
 const PAGE_SIZE = 25;
 
@@ -178,7 +178,7 @@ const AdminLessonsTab = () => {
           <option value="false">{t('admin_badge_inactive')}</option>
         </select>
         <button className="admin-btn" onClick={() => setShowForm(v => !v)}>
-          {showForm ? t('admin_cancel') : t('admin_new_lesson')}
+          {showForm ? t('admin_cancel') : <><IconPlus /> {t('admin_new_lesson')}</>}
         </button>
         <div className="admin-pagination">
           <button className="admin-btn admin-btn--sm" disabled={lessonPage === 0}

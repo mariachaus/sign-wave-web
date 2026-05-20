@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { API, headers, useDebounce } from './adminUtils';
-import { IconSearch } from '../Icons';
+import { IconSearch, IconPlus } from '../Icons';
 
 const PAGE_SIZE = 50;
 
@@ -100,7 +100,7 @@ const AdminGesturesTab = () => {
           <option value="true">{t('admin_badge_dynamic')}</option>
         </select>
         <button className="admin-btn" onClick={() => setShowForm(v => !v)}>
-          {showForm ? t('admin_cancel') : t('admin_new_gesture')}
+          {showForm ? t('admin_cancel') : <><IconPlus /> {t('admin_new_gesture')}</>}
         </button>
         <div className="admin-pagination">
           <button className="admin-btn admin-btn--sm" disabled={page === 0}
