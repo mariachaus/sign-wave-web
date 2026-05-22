@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
-  base: '/sign-wave-web/',
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/sign-wave-web/' : '/',
   plugins: [react()],
   test: {
     environment: 'node',
@@ -27,10 +27,11 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
     },
   },
   optimizeDeps: {
     exclude: ['@mediapipe/tasks-vision']
   }
-})
+}))

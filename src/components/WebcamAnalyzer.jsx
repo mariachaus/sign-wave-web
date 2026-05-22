@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { extractFeatures } from '../utils/feature_extractor';
 import { drawAllLandmarks } from '../utils/drawing_utils';
-import API_BASE_URL from '../config/api';
+import { useMLWebSocket } from '../hooks/useMLWebSocket';
 import '../styles/components/WebcamAnalyzer.scss';
 import { IconCamera, IconStop } from './Icons';
 
@@ -34,6 +34,8 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
   const predHistory   = useRef([]);
   const lastVideoTime = useRef(-1);
 
+  const { connect, disconnect, predict } = useMLWebSocket();
+
   const stop = () => {
     cancelAnimationFrame(rafRef.current);
     const video = videoRef.current;
@@ -46,10 +48,12 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
     lastVideoTime.current = -1;
     setPrediction({ label: '', confidence: 0 });
     setIsRunning(false);
+    disconnect();
   };
 
   const start = async () => {
     try {
+      await connect();
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video  = videoRef.current;
       const canvas = canvasRef.current;
@@ -65,12 +69,7 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
         const sendPredict = async (features) => {
           isPredicting.current = true;
           try {
-            const res  = await fetch(`${API_BASE_URL}/ml/predict`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ features }),
-            });
-            const data = await res.json();
+            const data = await predict(features);
             if (data.confidence > 0.6) {
               predHistory.current.push({ label: data.label, confidence: data.confidence });
               if (predHistory.current.length > 5) predHistory.current.shift();
@@ -84,7 +83,7 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
               setPrediction({ label: best, confidence: conf });
               if (conf > 0.8 && onGestureDetected) onGestureDetected(best);
             }
-          } catch (e) { console.error(e); }
+          } catch (e) { if (e.message !== 'busy') console.error(e); }
           finally { isPredicting.current = false; }
         };
 

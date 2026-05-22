@@ -2,6 +2,7 @@ import React, { useRef, useState, forwardRef, useImperativeHandle, useEffect } f
 import { useTranslation } from 'react-i18next';
 import { extractFeatures, computeDelta } from '../utils/feature_extractor';
 import { drawAllLandmarks } from '../utils/drawing_utils';
+import { useMLWebSocket } from '../hooks/useMLWebSocket';
 import { IconPlus } from './Icons';
 import API_BASE_URL from '../config/api';
 import '../styles/components/VideoInferenceBlock.scss';
@@ -57,12 +58,14 @@ const SingleVideoItem = forwardRef(({ file, poseModel, handModel, onRemove, mode
   const [statusText, setStatusText] = useState('idle');
   const [result, setResult] = useState(null);
   const [timeline, setTimeline] = useState([]);
-  const [livePred, setLivePred] = useState(null); // { label, confidence } for playback mode
+  const [livePred, setLivePred] = useState(null);
 
   const rafRef       = useRef(null);
   const isPredicting = useRef(false);
   const frameBuffer  = useRef([]);
   const predHistory  = useRef([]);
+
+  const { connect, disconnect, predict } = useMLWebSocket();
 
   useEffect(() => {
     const url = URL.createObjectURL(file);
@@ -158,6 +161,7 @@ const SingleVideoItem = forwardRef(({ file, poseModel, handModel, onRemove, mode
     frameBuffer.current  = [];
     predHistory.current  = [];
     isPredicting.current = false;
+    disconnect();
     setStatus('idle'); setStatusText('idle'); setLivePred(null);
   };
 
@@ -177,6 +181,8 @@ const SingleVideoItem = forwardRef(({ file, poseModel, handModel, onRemove, mode
     setStatus('playback'); setStatusText('playing…');
     setResult(null); setTimeline([]); setLivePred(null);
 
+    await connect();
+
     video.currentTime = 0;
     await new Promise(r => { video.onseeked = r; });
     video.play();
@@ -184,12 +190,7 @@ const SingleVideoItem = forwardRef(({ file, poseModel, handModel, onRemove, mode
     const sendPredict = async (features) => {
       isPredicting.current = true;
       try {
-        const res  = await fetch(`${API_BASE_URL}/ml/predict`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ features }),
-        });
-        const data = await res.json();
+        const data = await predict(features);
         if (data.confidence > 0.6) {
           predHistory.current.push({ label: data.label, confidence: data.confidence });
           if (predHistory.current.length > 5) predHistory.current.shift();
@@ -201,7 +202,7 @@ const SingleVideoItem = forwardRef(({ file, poseModel, handModel, onRemove, mode
           const matchCount = predHistory.current.filter(p => p.label === best).length;
           setLivePred({ label: best, confidence: scores[best] / matchCount });
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { if (e.message !== 'busy') console.error(e); }
       finally { isPredicting.current = false; }
     };
 
