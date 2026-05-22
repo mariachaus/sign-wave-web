@@ -10,6 +10,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
+  <script>
+    (function() {
+      var redirect = new URLSearchParams(window.location.search).get('redirect');
+      if (redirect) {
+        window.history.replaceState(null, '', '/sign-wave-web' + redirect);
+      }
+    })();
+  </script>
   <script type="module">
     import { FilesetResolver, PoseLandmarker, HandLandmarker, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
     // Записуємо їх у глобальне вікно, щоб React міг їх дістати

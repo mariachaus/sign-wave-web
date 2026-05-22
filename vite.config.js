@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
-  plugins: [react(), basicSsl()],
+  base: '/sign-wave-web/',
+  plugins: [react()],
   test: {
     environment: 'node',
     coverage: {
@@ -12,7 +12,6 @@ export default defineConfig({
     },
   },
   server: {
-    https: true,
     host: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
