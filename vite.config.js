@@ -4,6 +4,13 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
   plugins: [react(), basicSsl()],
+  test: {
+    environment: 'node',
+    coverage: {
+      provider: 'v8',
+      include: ['src/utils/feature_extractor.js'],
+    },
+  },
   server: {
     https: true,
     host: true,

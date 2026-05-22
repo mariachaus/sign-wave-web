@@ -11,6 +11,11 @@ import GestureDetailsPage from './components/GestureDetailsPage';
 import LevelsPage from './components/LevelsPage';
 import LessonPage from './components/LessonPage';
 import PracticePage from './components/PracticePage';
+import PracticeHubPage from './components/PracticeHubPage';
+import SignQuizPage from './components/SignQuizPage';
+import IdentifySignsPage from './components/IdentifySignsPage';
+import RepeatSignPage from './components/RepeatSignPage';
+import WatchReproducePage from './components/WatchReproducePage';
 import AchievementsPage from './components/AchievementsPage';
 import AdminPage from './components/AdminPage';
 import TermsPage from './components/TermsPage';
@@ -153,6 +158,11 @@ function App() {
           <Route path="/gestures/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><GestureDetailsPage /></PrivateRoute>} />
           <Route path="/learn" element={<PrivateRoute token={token} isLoaded={isLoaded}><LevelsPage /></PrivateRoute>} />
           <Route path="/lesson/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><LessonPage models={models} /></PrivateRoute>} />
+          <Route path="/practice" element={<PrivateRoute token={token} isLoaded={isLoaded}><PracticeHubPage /></PrivateRoute>} />
+          <Route path="/practice/sign-quiz" element={<PrivateRoute token={token} isLoaded={isLoaded}><SignQuizPage /></PrivateRoute>} />
+          <Route path="/practice/identify" element={<PrivateRoute token={token} isLoaded={isLoaded}><IdentifySignsPage /></PrivateRoute>} />
+          <Route path="/practice/repeat" element={<PrivateRoute token={token} isLoaded={isLoaded}><RepeatSignPage /></PrivateRoute>} />
+          <Route path="/practice/watch-reproduce" element={<PrivateRoute token={token} isLoaded={isLoaded}><WatchReproducePage models={models} /></PrivateRoute>} />
           <Route path="/practice/:gestureId" element={<PrivateRoute token={token} isLoaded={isLoaded}><PracticePage models={models} /></PrivateRoute>} />
           <Route path="/achievements" element={<PrivateRoute token={token} isLoaded={isLoaded}><AchievementsPage /></PrivateRoute>} />
           <Route path="/flashcards" element={<PrivateRoute token={token} isLoaded={isLoaded}><FlashcardsPage /></PrivateRoute>} />

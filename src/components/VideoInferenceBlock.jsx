@@ -1,6 +1,6 @@
 import React, { useRef, useState, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { extractFeatures } from '../utils/feature_extractor';
+import { extractFeatures, computeDelta } from '../utils/feature_extractor';
 import { drawAllLandmarks } from '../utils/drawing_utils';
 import { IconPlus } from './Icons';
 import API_BASE_URL from '../config/api';
@@ -13,14 +13,6 @@ const HandLandmarker = MP.HandLandmarker;
 
 const FRAMES = 20;
 const STEP   = 5;
-
-const computeDelta = (buffer) =>
-  buffer.map((frame, i) => {
-    const delta = i === 0
-      ? new Array(225).fill(0)
-      : frame.map((v, j) => v - buffer[i - 1][j]);
-    return [...frame, ...delta];
-  });
 
 const groupPredictions = (preds) => {
   if (!preds.length) return [];

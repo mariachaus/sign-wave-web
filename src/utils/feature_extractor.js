@@ -1,3 +1,11 @@
+export const computeDelta = (buffer) =>
+  buffer.map((frame, i) => {
+    const delta = i === 0
+      ? new Array(225).fill(0)
+      : frame.map((v, j) => v - buffer[i - 1][j]);
+    return [...frame, ...delta];
+  });
+
 export const extractFeatures = (poseResult, handResult) => {
   const frameData = new Array(225).fill(0);
   
