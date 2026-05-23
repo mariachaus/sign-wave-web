@@ -356,6 +356,16 @@ i18n
           "great_job": "Great job!",
           "keep_practicing": "Keep practicing!",
           "play_again": "Play again",
+
+          // Welcome (guest) block
+          "welcome_title": "Learn Ukrainian Sign Language",
+          "welcome_subtitle": "SignWave is an interactive platform with structured lessons, real-time gesture recognition, and adaptive repetition.",
+          "welcome_feature_lessons": "Structured lessons and levels",
+          "welcome_feature_webcam": "Real-time gesture recognition via webcam",
+          "welcome_feature_sm2": "Adaptive spaced repetition (SM-2)",
+          "welcome_feature_gamification": "Streaks, achievements and daily tasks",
+          "welcome_get_started": "Get Started",
+          "welcome_already_account": "Already have an account?",
         }
       },
       uk: {
@@ -708,6 +718,16 @@ i18n
           "great_job": "Молодець!",
           "keep_practicing": "Продовжуй тренуватися!",
           "play_again": "Ще раз",
+
+          // Welcome (guest) block
+          "welcome_title": "Вивчай українську жестову мову",
+          "welcome_subtitle": "SignWave — інтерактивна платформа з уроками, розпізнаванням жестів у реальному часі та адаптивним повторенням.",
+          "welcome_feature_lessons": "Структуровані уроки та рівні",
+          "welcome_feature_webcam": "Розпізнавання жестів через вебкамеру",
+          "welcome_feature_sm2": "Адаптивне повторення за алгоритмом SM-2",
+          "welcome_feature_gamification": "Стріки, досягнення та щоденні завдання",
+          "welcome_get_started": "Почати",
+          "welcome_already_account": "Вже є акаунт?",
         }
       }
     },

@@ -57,7 +57,7 @@ function App() {
     setToken(null);
     setIsLoaded(false);
     setIsAdmin(false);
-    window.location.href = '/auth';
+    window.location.href = import.meta.env.BASE_URL;
   };
 
   useEffect(() => {
@@ -90,8 +90,7 @@ function App() {
 
           // --- РОБОТА З МОВОЮ ---
           if (ui.language) {
-            localStorage.setItem('i18nextLng', ui.language); // Стандартний ключ для i18next
-            // Змінюємо мову в самому додатку, якщо вона відрізняється
+            localStorage.setItem('i18nextLng', ui.language); 
             if (i18n.language !== ui.language) {
               i18n.changeLanguage(ui.language);
             }
@@ -126,13 +125,13 @@ function App() {
     if (!token || location.pathname === '/terms') return null;
     return (
       <header className="app-header">
-        <div className="app-header__logo" onClick={() => window.location.href="/"}>
+        <div className="app-header__logo" onClick={() => window.location.href=import.meta.env.BASE_URL}>
           <div className="app-header__logo-icon">🤟</div>
           <h3 className="app-header__title">SignWave</h3>
         </div>
         <div className="app-header__right">
           {isAdmin && (
-            <button className="app-header__admin-btn" onClick={() => window.location.href="/admin"}>
+            <button className="app-header__admin-btn" onClick={() => window.location.href=import.meta.env.BASE_URL + 'admin'}>
               Admin
             </button>
           )}
@@ -143,14 +142,14 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <div className="App">
         <AppHeader />
 
         <ErrorBoundary>
         <Routes>
           <Route path="/auth" element={!token ? <AuthPage onLoginSuccess={(t) => setToken(t)} /> : <Navigate to="/" />} />
-          <Route path="/" element={<PrivateRoute token={token} isLoaded={isLoaded}><MainDashboard models={models} isAdmin={isAdmin} /></PrivateRoute>} />
+          <Route path="/" element={<MainDashboard models={models} isAdmin={isAdmin} isAuthenticated={!!token} isLoaded={isLoaded} />} />
           <Route path="/profile" element={<PrivateRoute token={token} isLoaded={isLoaded}><ProfilePage /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute token={token} isLoaded={isLoaded}><SettingsPage models={models} /></PrivateRoute>} />
           

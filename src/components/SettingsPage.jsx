@@ -194,7 +194,7 @@ const SettingsPage = ({ models }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       localStorage.clear();
-      window.location.href = '/auth';
+      window.location.href = import.meta.env.BASE_URL + 'auth';
     } catch (err) {
       showStatus("Delete failed", 'error');
     }

@@ -13,7 +13,7 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.clear();
-      window.location.href = '/auth';
+      window.location.href = import.meta.env.BASE_URL + 'auth';
     }
     if (error.response?.status >= 500) {
       console.error('Server error:', error.response?.data?.error || error.message);

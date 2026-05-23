@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
+const HERO_SIGNS = [
+  { word: 'Привіт',    emoji: '👋', bg: '#EDE9FE' },
+  { word: 'Будь ласка',emoji: '🙏', bg: '#D1FAE5' },
+  { word: 'Добре',     emoji: '👍', bg: '#FFE4E6' },
+  { word: 'Я',      emoji: '🤞', bg: '#FEF3C7' },
+];
 
 import { IconDownload, IconFlame, IconStar } from './Icons';
 import axios from 'axios';
@@ -13,7 +20,7 @@ import { downloadJSONDataset } from '../utils/json_manager';
 import API_BASE_URL from '../config/api';
 import '../styles/pages/MainDashboard.scss';
 
-const MainDashboard = ({ models, isAdmin }) => {
+const MainDashboard = ({ models, isAdmin, isAuthenticated, isLoaded }) => {
   const [tab, setTab] = useState(null);
   const [imageDataset, setImageDataset] = useState([]);
   const [videoDataset, setVideoDataset] = useState([]);
@@ -51,6 +58,7 @@ const MainDashboard = ({ models, isAdmin }) => {
   };
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     const lang = i18n.language || 'en';
     fetchWidgets(lang);
 
@@ -59,7 +67,7 @@ const MainDashboard = ({ models, isAdmin }) => {
     };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
-  }, [i18n.language]);
+  }, [i18n.language, isAuthenticated]);
 
   const taskLabel = (task) => {
     switch (task.task_type) {
@@ -71,6 +79,223 @@ const MainDashboard = ({ models, isAdmin }) => {
       default:                        return task.task_type;
     }
   };
+
+  const [animSign, setAnimSign] = useState(0);
+  useEffect(() => {
+    if (isAuthenticated) return;
+    const id = setInterval(() => setAnimSign(v => (v + 1) % HERO_SIGNS.length), 2200);
+    return () => clearInterval(id);
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    const sign = HERO_SIGNS[animSign];
+    const features = [
+      { icon: '📚', key: 'welcome_feature_lessons',     color: '#EDE9FE' },
+      { icon: '📷', key: 'welcome_feature_webcam',      color: '#D1FAE5' },
+      { icon: '🔁', key: 'welcome_feature_sm2',         color: '#FEF3C7' },
+      { icon: '🔥', key: 'welcome_feature_gamification',color: '#FFE4E6' },
+    ];
+    return (
+      <div className="dw">
+        {/* lang switcher */}
+        <div className="dw__lang">
+          {['uk','en'].map(lng => (
+            <button key={lng}
+              className={`dw__lang-btn${i18n.language===lng?' dw__lang-btn--active':''}`}
+              onClick={() => i18n.changeLanguage(lng)}>
+              {{ uk: 'УКР', en: 'ENG' }[lng]}
+            </button>
+          ))}
+        </div>
+
+        {/* ── HERO ── */}
+        <section className="dw__hero">
+          {/* left */}
+          <div className="dw__hero-text">
+            <div className="dw__badge-chip">
+              <span className="dw__badge-dot" />
+              {i18n.language === 'uk' ? 'Нове: розпізнавання через камеру' : 'New: camera-based recognition'}
+            </div>
+            <h1 className="dw__title">
+              {i18n.language === 'uk'
+                ? <>Говори <span className="dw__title-accent">руками</span>.</>
+                : <>Speak with your <span className="dw__title-accent">hands</span>.</>}
+            </h1>
+            <p className="dw__subtitle">{t('welcome_subtitle')}</p>
+            <div className="dw__actions">
+              <Link to="/auth" className="dw__btn dw__btn--primary">{t('welcome_get_started')}</Link>
+              <span className="dw__signin">
+                {t('welcome_already_account')}{' '}
+                <Link to="/auth" className="dw__link">{t('sign_in')}</Link>
+              </span>
+            </div>
+          </div>
+
+          {/* right: animated sign card */}
+          <div className="dw__hero-visual">
+            {/* decorative blob */}
+            <div className="dw__blob" />
+
+            {/* floating badges */}
+            <div className="dw__float dw__float--tl">
+              <span style={{ color: 'oklch(74% 0.18 45)', flexShrink: 0 }}><IconFlame size={20} /></span>
+              <div><div className="dw__float-val">14 {i18n.language==='uk'?'днів':'days'}</div><div className="dw__float-sub">{i18n.language==='uk'?'стрік':'streak'}</div></div>
+            </div>
+            <div className="dw__float dw__float--tr">
+              <span style={{ color: 'oklch(74% 0.18 75)', flexShrink: 0 }}><IconStar size={20} /></span>
+              <div><div className="dw__float-val">+25 XP</div><div className="dw__float-sub">{i18n.language==='uk'?'зароблено':'earned'}</div></div>
+            </div>
+            <div className="dw__float dw__float--bl">
+              <span className="dw__float-check">✓</span>
+              <div><div className="dw__float-val">{i18n.language==='uk'?'Урок пройдено':'Lesson done'}</div><div className="dw__float-sub">А-Г</div></div>
+            </div>
+            <div className="dw__float dw__float--br">
+              <span style={{ flexShrink: 0 }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="oklch(74% 0.18 55)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2H6v7a6 6 0 0 0 12 0V2z" fill="oklch(74% 0.18 55)" fillOpacity="0.2"/><path d="M10 14.66L7 22H17L14 14.66Z" fill="oklch(74% 0.18 55)" fillOpacity="0.2" stroke="none"/><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span>
+              <div><div className="dw__float-val">{i18n.language==='uk'?'Досягнення!':'Badge unlocked'}</div><div className="dw__float-sub">{i18n.language==='uk'?'Перший жест':'First Sign'}</div></div>
+            </div>
+
+            {/* center card */}
+            <div className="dw__sign-card">
+              <div className="dw__sign-visual" style={{ background: `linear-gradient(135deg, ${sign.bg}, ${sign.bg}88)` }}>
+                <div key={animSign} className="dw__sign-emoji">{sign.emoji}</div>
+              </div>
+              <div className="dw__sign-label">{i18n.language==='uk'?'Жест для':'Sign for'}</div>
+              <div key={`w-${animSign}`} className="dw__sign-word">{sign.word}</div>
+              <div className="dw__sign-dots">
+                {HERO_SIGNS.map((_, i) => (
+                  <div key={i} className={`dw__sign-dot${i===animSign?' dw__sign-dot--active':''}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FEATURES ── */}
+        <section className="dw__features">
+          <div className="dw__features-header">
+            <span className="dw__features-chip">
+              {i18n.language === 'uk' ? 'Що ви отримаєте' : 'What you get'}
+            </span>
+            <h2 className="dw__features-title">
+              {i18n.language === 'uk' ? 'Все, щоб жести залишились з вами' : 'Everything to make signing stick'}
+            </h2>
+          </div>
+          <div className="dw__features-grid">
+            {[
+              {
+                icon: '📚',
+                color: 'oklch(94% 0.06 290)',
+                uk_title: 'Структуровані уроки',
+                en_title: 'Bite-sized lessons',
+                uk_desc: 'Вивчайте алфавіт, привітання та повсякденні фрази за 5–10 хвилин.',
+                en_desc: 'Learn the alphabet, greetings and everyday phrases in 5–10 minute lessons.',
+              },
+              {
+                icon: '📹',
+                color: 'oklch(95% 0.06 165)',
+                uk_title: 'Практика через камеру',
+                en_title: 'Practice with camera',
+                uk_desc: 'Показуйте жест у камеру — система перевірить правильність форми руки в реальному часі.',
+                en_desc: "Sign back to your screen — we'll check your handshape in real time.",
+              },
+              {
+                icon: '🔥',
+                color: 'oklch(95% 0.06 25)',
+                uk_title: 'Щоденні стріки',
+                en_title: 'Daily streaks',
+                uk_desc: 'Маленькі щоденні цілі формують звичку. Не переривайте ланцюжок!',
+                en_desc: "Tiny daily goals that build a habit. Don't break the chain!",
+              },
+              {
+                icon: '📖',
+                color: 'oklch(96% 0.06 75)',
+                uk_title: 'Словник жестів',
+                en_title: 'Sign dictionary',
+                uk_desc: 'Знаходьте будь-який жест, дивіться як він виконується та зберігайте улюблені.',
+                en_desc: 'Look up any sign, see how it\'s made, save your favourites.',
+              },
+            ].map(f => (
+              <div key={f.en_title} className="dw__feature-card">
+                <div className="dw__feature-icon" style={{ background: f.color }}>{f.icon}</div>
+                <h3 className="dw__feature-title">{i18n.language === 'uk' ? f.uk_title : f.en_title}</h3>
+                <p className="dw__feature-desc">{i18n.language === 'uk' ? f.uk_desc : f.en_desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+        {/* ── WHY SIGN LANGUAGE ── */}
+        <section className="dw__why">
+          <div className="dw__why-inner">
+            <span className="dw__why-chip">
+              {i18n.language === 'uk' ? 'Навіщо жестова мова?' : 'Why sign language?'}
+            </span>
+            <h2 className="dw__why-heading">
+              {i18n.language === 'uk'
+                ? '72 мільйони людей з порушенням слуху. Один простий навик, що вас з\'єднає.'
+                : '72 million deaf people. One simple skill that connects you.'}
+            </h2>
+            <p className="dw__why-body">
+              {i18n.language === 'uk'
+                ? 'Жестова мова відкриває розмови з людьми з порушенням слуху — колегами, друзями, сусідами та родиною. Це також одна з найкрасивіших і найвиразніших мов у світі.'
+                : "Sign language opens conversations with deaf colleagues, friends, neighbours, and family. It's also one of the most beautiful, expressive languages in the world."}
+            </p>
+          </div>
+        </section>
+
+        {/* ── FINAL CTA ── */}
+        <section className="dw__cta">
+          <div className="dw__cta-box">
+            <span className="dw__cta-deco dw__cta-deco--tl">🤟</span>
+            <span className="dw__cta-deco dw__cta-deco--br">👋</span>
+            <span className="dw__cta-deco dw__cta-deco--tr">✋</span>
+            <span className="dw__cta-deco dw__cta-deco--bl">🙏</span>
+            <div className="dw__cta-inner">
+              <h2 className="dw__cta-heading">
+                {i18n.language === 'uk'
+                  ? 'Ваш перший жест — за один крок.'
+                  : 'Your first sign is one tap away.'}
+              </h2>
+              <p className="dw__cta-sub">
+                {i18n.language === 'uk'
+                  ? 'Лише п\'ять хвилин на день.'
+                  : 'Just five minutes a day.'}
+              </p>
+              <div className="dw__cta-actions">
+                <Link to="/auth" className="dw__cta-btn dw__cta-btn--white">
+                  {i18n.language === 'uk' ? 'Створити акаунт' : 'Create account'}
+                </Link>
+                <Link to="/auth" className="dw__cta-btn dw__cta-btn--ghost">
+                  {i18n.language === 'uk' ? 'Увійти' : 'Sign in'}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOOTER ── */}
+        <footer className="dw__footer">
+          <div className="dw__footer-left">
+            <span className="dw__footer-logo-icon">🤟</span>
+            <span className="dw__footer-logo-name">SignWave</span>
+            <span className="dw__footer-year">© {new Date().getFullYear()}</span>
+          </div>
+          <div className="dw__footer-right">
+            <Link to="/terms" className="dw__link">{t('terms_of_use')}</Link>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="loading-container">
+        <p>Loading models and data... Please wait</p>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-page">
