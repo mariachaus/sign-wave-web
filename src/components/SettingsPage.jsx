@@ -379,6 +379,15 @@ const SettingsPage = ({ models }) => {
             <button className="save-btn secondary" onClick={handleCancelVideo}>{t('cancel')}</button>
           </div>
           <button className="save-btn secondary" onClick={() => setShowPreview(true)}>{t('test_camera')}</button>
+
+          <div className="settings-tips">
+            <p className="settings-tips__title">{t('detection_tips_title')}</p>
+            <ul className="settings-tips__list">
+              <li>{t('detection_tip_lighting')}</li>
+              <li>{t('detection_tip_clothing')}</li>
+              <li>{t('detection_tip_backlight')}</li>
+            </ul>
+          </div>
         </div>
       )}
 

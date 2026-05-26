@@ -6,7 +6,7 @@ import { computeDelta, extractFeatures } from './feature_extractor.js';
 const makeLm = (x = 0, y = 0, z = 0) => ({ x, y, z });
 
 const emptyPose = () => ({ landmarks: [] });
-const emptyHands = () => ({ landmarks: [], handedness: [] });
+const emptyHands = () => ({ landmarks: [], handednesses: [] });
 
 // ─── computeDelta ────────────────────────────────────────────────────────────
 
@@ -90,7 +90,7 @@ describe('extractFeatures', () => {
     const lms = [makeLm(0.2, 0.2), ...Array(20).fill(makeLm())];
     const hands = {
       landmarks: [lms],
-      handedness: [[{ categoryName: 'Left' }]],
+      handednesses: [[{ categoryName: 'Left' }]],
     };
     const frame = extractFeatures(emptyPose(), hands);
     expect(frame[99]).toBeCloseTo(0.2);
@@ -101,7 +101,7 @@ describe('extractFeatures', () => {
     const lms = [makeLm(0.7, 0.8), ...Array(20).fill(makeLm())];
     const hands = {
       landmarks: [lms],
-      handedness: [[{ categoryName: 'Right' }]],
+      handednesses: [[{ categoryName: 'Right' }]],
     };
     const frame = extractFeatures(emptyPose(), hands);
     expect(frame[162]).toBeCloseTo(0.7);
@@ -113,7 +113,7 @@ describe('extractFeatures', () => {
     const rightLms = [makeLm(0.9, 0.9), ...Array(20).fill(makeLm())];
     const hands = {
       landmarks: [leftLms, rightLms],
-      handedness: [[{ categoryName: 'Left' }], [{ categoryName: 'Right' }]],
+      handednesses: [[{ categoryName: 'Left' }], [{ categoryName: 'Right' }]],
     };
     const frame = extractFeatures(emptyPose(), hands);
     expect(frame[99]).toBeCloseTo(0.1);

@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import { extractFeatures } from '../utils/feature_extractor';
 import { drawAllLandmarks } from '../utils/drawing_utils';
 import { useMLWebSocket } from '../hooks/useMLWebSocket';
+import API_BASE_URL from '../config/api';
 import '../styles/components/WebcamAnalyzer.scss';
 import { IconCamera, IconStop } from './Icons';
 
@@ -22,7 +24,7 @@ const computeDelta = (buffer) =>
   });
 
 const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isMirrorProp }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const videoRef  = useRef(null);
   const canvasRef = useRef(null);
   const rafRef    = useRef(null);
@@ -33,6 +35,7 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
   const frameBuffer   = useRef([]);
   const predHistory   = useRef([]);
   const lastVideoTime = useRef(-1);
+  const labelMap      = useRef({});
 
   const { connect, disconnect, predict } = useMLWebSocket();
 
@@ -54,6 +57,14 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
   const start = async () => {
     try {
       await connect();
+
+      const lang    = i18n.language || 'uk';
+      const token   = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      try {
+        const { data } = await axios.get(`${API_BASE_URL}/api/gestures?lang=${lang}`, { headers });
+        labelMap.current = Object.fromEntries(data.map(g => [g.model_label, g.name]));
+      } catch { /* fallback на сирий label */ }
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video  = videoRef.current;
       const canvas = canvasRef.current;
@@ -123,7 +134,7 @@ const WebcamAnalyzer = ({ poseModel, handModel, onGestureDetected, isMirror: isM
         <canvas ref={canvasRef} className="webcam-analyzer__canvas" style={mirrorStyle} />
         {prediction.label && (
           <div className={`webcam-analyzer__prediction webcam-analyzer__prediction--${predMod}`}>
-            {prediction.label.toUpperCase()}
+            {labelMap.current[prediction.label] ?? prediction.label.toUpperCase()}
             <span className="webcam-analyzer__prediction__conf">
               {(prediction.confidence * 100).toFixed(0)}%
             </span>

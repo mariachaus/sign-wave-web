@@ -5,6 +5,7 @@ import ImitationExercise from './ImitationExercise';
 import QuizExercise from './QuizExercise';
 import MatchingExercise from './MatchingExercise';
 import RecallExercise from './RecallExercise';
+import IdentifyExercise from './IdentifyExercise';
 import API_BASE_URL from '../../config/api';
 import '../../styles/pages/Exercises.scss';
 
@@ -138,6 +139,15 @@ const LessonController = ({ lessonId, models, onLessonComplete, onLessonFailed, 
           gesture={currentStep.gesture}
           models={models}
           onSuccess={handleStepSuccess}
+        />
+      )}
+
+      {currentStep.type === 'identify' && (
+        <IdentifyExercise
+          targetGesture={currentStep.target}
+          allGestures={currentStep.options}
+          onSuccess={handleStepSuccess}
+          onError={handleError}
         />
       )}
     </div>

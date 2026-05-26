@@ -13,7 +13,8 @@ export const downloadJSONDataset = (dataset) => {
     link.href = url;
 
     const labels = [...new Set(dataset.map(d => d.label))].join('_');
-    link.download = `dataset_${labels}.json`;
+    const n = dataset[0]?.sequence?.length;
+    link.download = `dataset-${labels}${n ? `-${n}` : ''}.json`;
     
     document.body.appendChild(link);
     link.click();

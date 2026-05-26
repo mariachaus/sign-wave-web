@@ -3,17 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
+import IdentifyExercise from './exercises/IdentifyExercise';
 import '../styles/pages/StandaloneExercise.scss';
 
 const N_ROUNDS = 8;
-
-const buildOpts = (target, pool) => {
-  const others = pool
-    .filter(g => g.id !== target.id)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
-  return [...others, target].sort(() => Math.random() - 0.5);
-};
 
 const ResultsScreen = ({ score, total, onRestart, onBack, t }) => (
   <div className="ex-page">
@@ -42,9 +35,6 @@ const IdentifySignsPage = () => {
   const [allGestures, setAllGestures] = useState([]);
   const [session, setSession] = useState([]);
   const [round, setRound] = useState(0);
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [isCorrect, setIsCorrect] = useState(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -61,41 +51,23 @@ const IdentifySignsPage = () => {
         setAllGestures(all);
         const sess = [...withDesc].sort(() => Math.random() - 0.5).slice(0, Math.min(N_ROUNDS, withDesc.length));
         setSession(sess);
-        if (sess.length) setOptions(buildOpts(sess[0], all));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [i18n.language]);
 
-  const handleSelect = (id) => {
-    if (selected !== null) return;
-    setSelected(id);
-    const correct = id === session[round].id;
-    setIsCorrect(correct);
-    if (correct) setScore(s => s + 1);
-
-    setTimeout(() => {
-      const next = round + 1;
-      if (next >= session.length) {
-        setDone(true);
-      } else {
-        setOptions(buildOpts(session[next], allGestures));
-        setSelected(null);
-        setIsCorrect(null);
-        setRound(next);
-      }
-    }, 1200);
+  const handleSuccess = () => {
+    setScore(s => s + 1);
+    if (round + 1 >= session.length) setDone(true);
+    else setRound(r => r + 1);
   };
 
   const restart = () => {
     const withDesc = allGestures.filter(g => g.description);
     const sess = [...withDesc].sort(() => Math.random() - 0.5).slice(0, Math.min(N_ROUNDS, withDesc.length));
     setSession(sess);
-    if (sess.length) setOptions(buildOpts(sess[0], allGestures));
     setRound(0);
     setScore(0);
-    setSelected(null);
-    setIsCorrect(null);
     setDone(false);
   };
 
@@ -107,8 +79,6 @@ const IdentifySignsPage = () => {
     </div>
   );
   if (done) return <ResultsScreen score={score} total={session.length} onRestart={restart} onBack={() => navigate('/practice')} t={t} />;
-
-  const target = session[round];
 
   return (
     <div className="ex-page">
@@ -127,32 +97,12 @@ const IdentifySignsPage = () => {
         <span className="ex-page__round">{round + 1}/{session.length}</span>
       </div>
       <div className="ex-page__body">
-        <div className="identify-exercise">
-          <p className="exercise-instruction">{t('identify_from_desc')}</p>
-          <div className="identify-exercise__desc">{target.description}</div>
-          <div className="identify-exercise__options">
-            {options.map(opt => (
-              <button
-                key={opt.id}
-                onClick={() => handleSelect(opt.id)}
-                disabled={selected !== null}
-                className={[
-                  'identify-exercise__option',
-                  selected === opt.id && isCorrect  ? 'identify-exercise__option--correct' : '',
-                  selected === opt.id && !isCorrect ? 'identify-exercise__option--wrong'   : '',
-                  selected !== null && selected !== opt.id && opt.id === target.id
-                    ? 'identify-exercise__option--reveal' : '',
-                ].filter(Boolean).join(' ')}
-              >
-                {opt.name}
-              </button>
-            ))}
-          </div>
-          <div className="exercise-feedback">
-            {isCorrect === true  && <span className="exercise-feedback--correct">{t('correct_well_done')}!</span>}
-            {isCorrect === false && <span className="exercise-feedback--wrong">{t('try_again')}</span>}
-          </div>
-        </div>
+        <IdentifyExercise
+          key={`${round}-${session[round].id}`}
+          targetGesture={session[round]}
+          allGestures={allGestures}
+          onSuccess={handleSuccess}
+        />
       </div>
     </div>
   );

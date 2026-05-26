@@ -15,7 +15,7 @@ import { exportLandmarksToVector } from '../utils/csv_manager';
 import { IconPlay, IconPlus, IconCheck, IconLoader } from './Icons';
 
 // ============================================================================
-// 1. ДОЧІРНІЙ КОМПОНЕНТ: Відповідає суворо за ОДНЕ відео
+// 1. ДОЧІРНІЙ КОМПОНЕНТо
 // ============================================================================
 
 const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence, onRemove }) => {
@@ -30,13 +30,13 @@ const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, h
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const SEQUENCE_LENGTH = sequenceLength;
+  const [videoDuration, setVideoDuration] = useState(null);
 
-  // Коли приходить новий файл, створюємо для нього URL
   useEffect(() => {
     if (file) {
       const url = URL.createObjectURL(file);
       setVideoSrc(url);
-      // Очищення пам'яті, коли компонент зникає
+
       return () => URL.revokeObjectURL(url);
     }
   }, [file]);
@@ -138,7 +138,11 @@ const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, h
       </div>
 
       <div className="video-processor__video-wrap">
-        <video ref={videoRef} src={videoSrc} muted className="video-processor__video" crossOrigin="anonymous" />
+        <video ref={videoRef} src={videoSrc} muted className="video-processor__video" crossOrigin="anonymous"
+          onLoadedMetadata={() => setVideoDuration(videoRef.current?.duration)} />
+        {videoDuration != null && (
+          <span className="video-processor__duration">{videoDuration.toFixed(1)} {t('sec')}</span>
+        )}
         <canvas ref={canvasRef} className="video-processor__canvas" />
       </div>
 
@@ -238,6 +242,8 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
             ))}
           </div>
         </div>
+
+        <p className="upload-settings__note">{t('nose_normalization_note')}</p>
       </div>
 
       <div

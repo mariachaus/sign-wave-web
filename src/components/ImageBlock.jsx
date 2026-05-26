@@ -15,7 +15,7 @@ import { IconPlus, IconCheck } from './Icons';
 // ============================================================================
 // Single image card
 // ============================================================================
-const SingleImageProcessor = ({ file, gestureLabel, poseModel, handModel, onAddRecord, onRemove }) => {
+const SingleImageProcessor = ({ file, gestureLabel, normalize, poseModel, handModel, onAddRecord, onRemove }) => {
   const { t } = useTranslation();
   const [imageSrc, setImageSrc] = useState(null);
   const [coordsText, setCoordsText] = useState("");
@@ -69,7 +69,7 @@ const SingleImageProcessor = ({ file, gestureLabel, poseModel, handModel, onAddR
   const handleAdd = () => {
     if (!gestureLabel || !results?.pose?.landmarks?.[0]) return;
     localStorage.setItem("lastLabel", gestureLabel);
-    const vector = exportLandmarksToVector(results.pose.landmarks[0], results.hand);
+    const vector = exportLandmarksToVector(results.pose.landmarks[0], results.hand, normalize);
     onAddRecord({ label: gestureLabel, data: vector });
     setIsAdded(true);
   };
@@ -114,6 +114,7 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
   const [files, setFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [gestureLabel, setGestureLabel] = useState(localStorage.getItem("lastLabel") || "");
+  const [normalize, setNormalize] = useState(localStorage.getItem("imgNormalize") === "true");
 
   const addFiles = (incoming) => {
     const next = [...files];
@@ -131,6 +132,11 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
     localStorage.setItem("lastLabel", e.target.value);
   };
 
+  const handleNormalizeChange = (e) => {
+    setNormalize(e.target.checked);
+    localStorage.setItem("imgNormalize", e.target.checked);
+  };
+
   return (
     <div className="image-block">
       <div className="upload-settings">
@@ -143,6 +149,16 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
             onChange={handleLabelChange}
             className="upload-settings__text-input"
           />
+        </div>
+
+        <div className="upload-settings__field upload-settings__field--row">
+          <label className="settings-toggle">
+            <input type="checkbox" checked={normalize} onChange={handleNormalizeChange} />
+            <span className="settings-toggle__track">
+              <span className="settings-toggle__thumb" />
+            </span>
+          </label>
+          <span className="upload-settings__label">{t('normalize_by_nose')}</span>
         </div>
       </div>
 
@@ -177,6 +193,7 @@ const ImageBlock = ({ poseModel, handModel, onAddRecord }) => {
                 key={`${file.name}-${idx}`}
                 file={file}
                 gestureLabel={gestureLabel}
+                normalize={normalize}
                 poseModel={poseModel}
                 handModel={handModel}
                 onAddRecord={onAddRecord}

@@ -479,11 +479,12 @@
   &__content {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 32px;
   }
 
   &__thumb {
     width: 60%;
+    max-width: 320px;
     height: 100%;
     object-fit: contain;
     border-radius: var(--radius-md);
@@ -1172,7 +1173,9 @@
 
   &__features-chip   { background: oklch(25% .06 165); color: oklch(72% .12 165); }
   &__features-title  { color: var(--color-text); }
-  &__feature-card    { background: var(--color-surface); border-color: var(--color-border); color: var(--color-text); }
+  &__feature-card    { background: var(--color-surface); border-color: var(--color-border); }
+  &__feature-title   { color: var(--color-text); }
+  &__feature-desc    { color: var(--color-text-muted); }
 
   &__why             { background: var(--color-surface); border-color: var(--color-border); }
   &__why-chip        { background: oklch(25% .06 75); color: oklch(78% .14 75); }

@@ -10,15 +10,11 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
     // --- 0. Отримуємо налаштування ---
     const rawVisible = localStorage.getItem('is_landmarks_visible');
     
-    // Перетворюємо рядок "true"/"false" у реальний булевий тип
-    // Якщо в стореджі нічого немає, за замовчуванням ставимо true
     const isVisible = rawVisible === null ? true : rawVisible === 'true';
     
     const skeletonColor = localStorage.getItem('skeleton_color') || '#00FF00';
     const connectionColor = localStorage.getItem('connection_color') || '#FF0000';
 
-    // 1. СИНХРОНІЗАЦІЯ (SNAP) - вона має працювати завжди для логіки, 
-    // навіть якщо ми не бачимо результат, щоб координати оновлювалися
     if (poseResult?.landmarks?.[0] && handResult?.landmarks) {
         const poseLandmarks = poseResult.landmarks[0];
         const POSE_LEFT_WRIST = 15;
@@ -41,7 +37,7 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
         });
     }
 
-    // ЯКЩО СКЕЛЕТ ВИМКНЕНО — ПРИПИНЯЄМО МАЛЮВАННЯ ТУТ
+    // ЯКЩО СКЕЛЕТ ВИМКНЕНО СТОП МАЛЮВАННЯ ТУТ
     if (!isVisible) return;
 
     // 2. Малюємо Pose
@@ -64,7 +60,6 @@ export function drawAllLandmarks(drawingUtils, poseResult, handResult, poseConne
         });
     }
 
-    // 3. Малюємо Hands
     if (handResult?.landmarks) {
         handResult.landmarks.forEach((landmarks) => {
             drawingUtils.drawConnectors(landmarks, handConnections, { 

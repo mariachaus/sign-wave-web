@@ -31,9 +31,9 @@ export const extractFeatures = (poseResult, handResult) => {
   }
 
   // 3. Обробка Hands
-  if (handResult?.landmarks && handResult.handedness) {
+  if (handResult?.landmarks && handResult.handednesses) {
     handResult.landmarks.forEach((handLandmarks, index) => {
-      const label = handResult.handedness[index][0].categoryName;
+      const label = handResult.handednesses[index][0].categoryName;
       const offset = label === "Left" ? 99 : 162;
 
       handLandmarks.forEach((lm, i) => {

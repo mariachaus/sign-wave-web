@@ -1,9 +1,11 @@
-export function exportLandmarksToVector(poseLandmarks, handResult) {
+export function exportLandmarksToVector(poseLandmarks, handResult, normalize = false) {
     const features = [];
-    
+
+    const noseX = normalize && poseLandmarks?.[0] ? poseLandmarks[0].x : 0;
+    const noseY = normalize && poseLandmarks?.[0] ? poseLandmarks[0].y : 0;
 
     if (poseLandmarks && poseLandmarks.length > 0) {
-        poseLandmarks.forEach(lm => features.push(lm.x, lm.y, lm.z));
+        poseLandmarks.forEach(lm => features.push(lm.x - noseX, lm.y - noseY, lm.z));
     } else {
         for (let i = 0; i < 99; i++) features.push(0);
     }
@@ -14,15 +16,14 @@ export function exportLandmarksToVector(poseLandmarks, handResult) {
     if (handResult && handResult.landmarks) {
         for (let i = 0; i < handResult.landmarks.length; i++) {
             const landmarks = handResult.landmarks[i];
-            const handedness = handResult.handednesses[i][0].categoryName; 
+            const handedness = handResult.handednesses[i][0].categoryName;
             const flatHand = [];
-            landmarks.forEach(lm => flatHand.push(lm.x, lm.y, lm.z));
+            landmarks.forEach(lm => flatHand.push(lm.x - noseX, lm.y - noseY, lm.z));
 
             if (handedness === "Left") leftHandData = flatHand;
             else rightHandData = flatHand;
         }
     }
-    
 
     return features.concat(leftHandData).concat(rightHandData);
 }
