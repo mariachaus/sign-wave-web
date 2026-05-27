@@ -4,21 +4,16 @@
   text-align: center;
   position: relative;
   overflow: visible;
+  cursor: pointer;
 }
 
 .achievement-card {
   position: relative;
   width: 80px;
-  cursor: help;
 
   &:hover {
     .achievement-icon-shape {
       transform: translateY(-5px) scale(1.1);
-    }
-    .achievement-tooltip {
-      visibility: visible;
-      opacity: 1;
-      bottom: 110%;
     }
   }
 }
@@ -55,7 +50,7 @@
   margin-top: 5px;
   font-size: 11px;
   font-weight: 600;
-  color: #444;
+  color: var(--color-text);
   white-space: normal;
   word-break: break-word;
   line-height: 1.3;
@@ -79,36 +74,94 @@
   }
 }
 
-.achievement-tooltip {
-  visibility: hidden;
-  opacity: 0;
-  width: 160px;
-  background-color: rgba(33, 33, 33, 0.98);
-  color: #fff;
-  text-align: center;
-  border-radius: 8px;
-  padding: 10px;
-  position: absolute;
-  z-index: 9999;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 95%;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  pointer-events: none;
+/* ── Achievement detail modal ─────────────────────────────────── */
+.ach-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
 
-  &::after {
-    content: '';
+.ach-modal {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg, 0 8px 32px rgba(0,0,0,0.3));
+  padding: 32px 28px 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  animation: ach-modal-in 0.2s ease;
+
+  &__close {
     position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px;
-    border-style: solid;
-    border-color: #212121 transparent transparent transparent;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0;
+
+    &:hover { color: var(--color-text); }
   }
 
-  .tooltip-description { margin: 0; font-size: 12px; line-height: 1.4; }
-  .tooltip-reward { margin-top: 6px; font-size: 11px; font-weight: bold; color: #ffca28; }
-  .tooltip-date { font-size: 10px; color: #bbb; margin-top: 4px; }
+  &__icon {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__name {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 10px;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+
+  &__xp {
+    display: inline-block;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 6px 16px;
+  }
+
+  &__date {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+}
+
+@keyframes ach-modal-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }

@@ -87,6 +87,7 @@ const MainDashboard = ({ models, isAdmin, isAuthenticated, isLoaded }) => {
     return () => clearInterval(id);
   }, [isAuthenticated]);
 
+
   if (!isAuthenticated) {
     const sign = HERO_SIGNS[animSign];
     const features = [
@@ -374,7 +375,14 @@ const MainDashboard = ({ models, isAdmin, isAuthenticated, isLoaded }) => {
               <div className="widget-stat__badge shield-badge">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 ×{streak.freeze_shields}
-                <span className="shield-badge__tooltip">{t('freeze_shields_tooltip')}</span>
+                <div className="shield-badge__popup">
+                  <p className="shield-badge__popup-title">{t('shield_info_title')}</p>
+                  <ul className="shield-badge__popup-list">
+                    <li>{t('shield_info_tip1')}</li>
+                    <li>{t('shield_info_tip2')}</li>
+                    <li>{t('shield_info_tip3')}</li>
+                  </ul>
+                </div>
               </div>
             )}
           </div>
