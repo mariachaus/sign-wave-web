@@ -180,6 +180,10 @@ i18n
           "view_details": "View Details",
           "freeze_shields": "Freeze Shields",
           "freeze_shields_tooltip": "Freeze shields protect your streak when you miss a day",
+          "shield_info_title": "Freeze Shields",
+          "shield_info_tip1": "Automatically protects your streak if you miss one day",
+          "shield_info_tip2": "Earned as milestone rewards (7, 14, 30-day streaks)",
+          "shield_info_tip3": "You can hold up to 2 shields at a time",
 
           // Daily tasks
           "daily_tasks": "Daily Tasks",
@@ -285,6 +289,21 @@ i18n
           "admin_badge_inactive": "inactive",
           "admin_badge_yes": "yes",
           "admin_badge_no": "no",
+
+          // Admin model info
+          "admin_model_title": "ML Model",
+          "admin_model_loaded": "active",
+          "admin_model_not_loaded": "not loaded",
+          "admin_model_classes": "Classes",
+          "admin_model_frames": "Frames",
+          "admin_model_features": "Features/frame",
+          "admin_model_size": "Size",
+          "admin_model_params": "Parameters",
+          "admin_model_show_classes": "Show classes ({{n}})",
+          "admin_model_hide_classes": "Hide classes",
+          "admin_model_available": "Available models",
+          "admin_model_activate": "Activate",
+          "admin_model_no_labels": "no labels",
 
           // Admin levels
           "admin_tab_levels": "Levels",
@@ -549,6 +568,10 @@ i18n
           "view_details": "Детальніше",
           "freeze_shields": "Щити заморозки",
           "freeze_shields_tooltip": "Щити захищають стрік, якщо ви пропустили день",
+          "shield_info_title": "Щити заморозки",
+          "shield_info_tip1": "Автоматично захищає стрік, якщо ви пропустили один день",
+          "shield_info_tip2": "Нараховуються за milestone стріку (7, 14, 30 днів)",
+          "shield_info_tip3": "Можна мати до 2 щитів одночасно",
 
           // Daily tasks
           "daily_tasks": "Щоденні завдання",
@@ -654,6 +677,21 @@ i18n
           "admin_badge_inactive": "неактивний",
           "admin_badge_yes": "так",
           "admin_badge_no": "ні",
+
+          // Admin model info
+          "admin_model_title": "ML-модель",
+          "admin_model_loaded": "активна",
+          "admin_model_not_loaded": "не завантажена",
+          "admin_model_classes": "Класи",
+          "admin_model_frames": "Кадри",
+          "admin_model_features": "Ознаки/кадр",
+          "admin_model_size": "Розмір",
+          "admin_model_params": "Параметри",
+          "admin_model_show_classes": "Показати класи ({{n}})",
+          "admin_model_hide_classes": "Сховати класи",
+          "admin_model_available": "Доступні моделі",
+          "admin_model_activate": "Активувати",
+          "admin_model_no_labels": "немає labels",
 
           // Admin levels
           "admin_tab_levels": "Рівні",

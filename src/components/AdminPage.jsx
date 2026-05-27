@@ -37,12 +37,41 @@ const AdminPage = () => {
   const { t } = useTranslation();
   const [tab, setTab] = useState('overview');
   const [stats, setStats] = useState(null);
+  const [modelInfo, setModelInfo] = useState(null);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [showClasses, setShowClasses] = useState(false);
+  const [activating, setActivating] = useState(false);
+  const [activateError, setActivateError] = useState('');
 
   useEffect(() => {
     axios.get(`${API}/api/admin/stats`, { headers: headers() })
       .then(res => setStats(res.data))
       .catch(err => { if (err.response?.status === 403) navigate('/'); });
+    axios.get(`${API}/api/admin/model-info`, { headers: headers() })
+      .then(res => setModelInfo(res.data))
+      .catch(() => {});
+    axios.get(`${API}/api/admin/models`, { headers: headers() })
+      .then(res => setAvailableModels(res.data))
+      .catch(() => {});
   }, [navigate]);
+
+  const handleActivate = async (filename) => {
+    setActivating(true);
+    setActivateError('');
+    try {
+      await axios.post(`${API}/api/admin/model-activate`, { model_file: filename }, { headers: headers() });
+      const [info, models] = await Promise.all([
+        axios.get(`${API}/api/admin/model-info`, { headers: headers() }),
+        axios.get(`${API}/api/admin/models`, { headers: headers() }),
+      ]);
+      setModelInfo(info.data);
+      setAvailableModels(models.data);
+    } catch (e) {
+      setActivateError(e.response?.data?.detail || t('admin_error_generic'));
+    } finally {
+      setActivating(false);
+    }
+  };
 
   return (
     <div className="admin-page">
@@ -71,21 +100,96 @@ const AdminPage = () => {
 
       <main className="admin-main">
         {tab === 'overview' && stats && (
-          <div className="admin-stats">
-            {[
-              { label: t('admin_total_users'),     value: stats.total_users },
-              { label: t('admin_active_users'),    value: stats.active_users },
-              { label: t('admin_total_gestures'),  value: stats.total_gestures },
-              { label: t('admin_active_gestures'), value: stats.active_gestures },
-              { label: t('admin_total_lessons'),   value: stats.total_lessons },
-              { label: t('admin_total_xp'),        value: stats.total_xp.toLocaleString() },
-            ].map(s => (
-              <div key={s.label} className="admin-stat-card">
-                <div className="admin-stat-card__value">{s.value}</div>
-                <div className="admin-stat-card__label">{s.label}</div>
+          <>
+            <div className="admin-stats">
+              {[
+                { label: t('admin_total_users'),     value: stats.total_users },
+                { label: t('admin_active_users'),    value: stats.active_users },
+                { label: t('admin_total_gestures'),  value: stats.total_gestures },
+                { label: t('admin_active_gestures'), value: stats.active_gestures },
+                { label: t('admin_total_lessons'),   value: stats.total_lessons },
+                { label: t('admin_total_xp'),        value: stats.total_xp.toLocaleString() },
+              ].map(s => (
+                <div key={s.label} className="admin-stat-card">
+                  <div className="admin-stat-card__value">{s.value}</div>
+                  <div className="admin-stat-card__label">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {modelInfo && (
+              <div className="admin-model-card">
+                <div className="admin-model-card__header">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
+                  <span className="admin-model-card__title">{t('admin_model_title')}</span>
+                  <span className={`admin-badge ${modelInfo.model_loaded ? 'admin-badge--on' : 'admin-badge--off'}`}>
+                    {modelInfo.model_loaded ? t('admin_model_loaded') : t('admin_model_not_loaded')}
+                  </span>
+                </div>
+
+                <div className="admin-model-card__filename">{modelInfo.model_file}</div>
+
+                <div className="admin-model-card__grid">
+                  {[
+                    { label: t('admin_model_classes'),  value: modelInfo.num_classes },
+                    { label: t('admin_model_frames'),   value: modelInfo.window_frames },
+                    { label: t('admin_model_features'), value: modelInfo.features_per_frame },
+                    { label: t('admin_model_size'),     value: `${modelInfo.model_size_mb} MB` },
+                    { label: t('admin_model_params'),   value: modelInfo.param_count != null ? modelInfo.param_count.toLocaleString() : '—' },
+                  ].map(item => (
+                    <div key={item.label} className="admin-model-card__item">
+                      <div className="admin-model-card__item-value">{item.value}</div>
+                      <div className="admin-model-card__item-label">{item.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  className="admin-btn admin-btn--sm"
+                  style={{ marginTop: 12 }}
+                  onClick={() => setShowClasses(v => !v)}
+                >
+                  {showClasses ? t('admin_model_hide_classes') : t('admin_model_show_classes', { n: modelInfo.num_classes })}
+                </button>
+
+                {showClasses && (
+                  <div className="admin-model-card__classes">
+                    {modelInfo.classes.map(cls => (
+                      <span key={cls} className="admin-code">{cls}</span>
+                    ))}
+                  </div>
+                )}
+
+                {availableModels.length > 0 && (
+                  <div className="admin-model-card__switcher">
+                    <div className="admin-model-card__switcher-title">{t('admin_model_available')}</div>
+                    {activateError && <div className="admin-error" style={{ marginBottom: 8 }}>{activateError}</div>}
+                    {availableModels.map(m => (
+                      <div key={m.filename} className={`admin-model-row${m.is_active ? ' admin-model-row--active' : ''}`}>
+                        <div className="admin-model-row__name">
+                          <span className="admin-code">{m.filename}</span>
+                          <span className="admin-model-row__meta">{m.size_mb} MB</span>
+                          {!m.has_labels && <span className="admin-badge admin-badge--off">{t('admin_model_no_labels')}</span>}
+                        </div>
+                        {m.is_active
+                          ? <span className="admin-badge admin-badge--on">{t('admin_model_loaded')}</span>
+                          : <button
+                              className="admin-btn admin-btn--sm admin-btn--primary"
+                              disabled={activating}
+                              onClick={() => handleActivate(m.filename)}
+                            >
+                              {activating ? '...' : t('admin_model_activate')}
+                            </button>
+                        }
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
         {tab === 'users'    && <AdminUsersTab />}
         {tab === 'gestures' && <AdminGesturesTab />}
