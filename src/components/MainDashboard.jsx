@@ -234,8 +234,8 @@ const MainDashboard = ({ models, isAdmin, isAuthenticated, isLoaded }) => {
             </span>
             <h2 className="dw__why-heading">
               {i18n.language === 'uk'
-                ? '72 мільйони людей з порушенням слуху. Один простий навик, що вас з\'єднає.'
-                : '72 million deaf people. One simple skill that connects you.'}
+                ? '430 мільйонів людей по всьому світу. Один простий навик, що вас з\'єднає.'
+                : '430 million people worldwide. One simple skill that connects you.'}
             </h2>
             <p className="dw__why-body">
               {i18n.language === 'uk'

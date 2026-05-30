@@ -1201,6 +1201,7 @@
   &__lang-btn {
     border-color: var(--color-border);
     color: var(--color-text-muted);
+    &--active { color: #fff; }
   }
 
   &__cta-heading     { color: #fff; }

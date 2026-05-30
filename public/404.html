@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <script>
-      var path = window.location.pathname.replace('/sign-wave-web', '');
+      var path = window.location.pathname.replace('/sign-wave-web', '') + window.location.search + window.location.hash;
       window.location.replace('/sign-wave-web/' + '?redirect=' + encodeURIComponent(path));
     </script>
   </head>

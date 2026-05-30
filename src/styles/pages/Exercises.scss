@@ -288,7 +288,7 @@
 }
 
 .matching-exercise__item {
-  height: 76px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -563,7 +563,7 @@
   .quiz-exercise__word   { font-size: 1.75rem; }
 
   .matching-exercise__grid { gap: 16px; }
-  .matching-exercise__item { height: 60px; font-size: 1rem; }
+  .matching-exercise__item { height: 90px; font-size: 1rem; }
 
   .recall-exercise__word { font-size: 2rem; }
 

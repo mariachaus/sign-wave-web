@@ -310,6 +310,15 @@ i18n
           "admin_new_level": "New level",
           "admin_confirm_delete_level": "Delete level \"{{name}}\"? All its lessons will lose their level.",
 
+          // Admin categories
+          "admin_tab_categories": "Categories",
+          "admin_new_category": "New category",
+          "admin_confirm_delete_category": "Delete category \"{{name}}\"? All gesture assignments will be removed.",
+          "admin_categories_title": "Categories",
+          "admin_category_placeholder": "— category —",
+          "admin_synonyms_title": "Synonyms",
+          "admin_synonym_placeholder": "New synonym…",
+
           // Admin lessons
           "admin_tab_lessons": "Lessons",
           "admin_search_lessons": "Search by name…",
@@ -697,6 +706,15 @@ i18n
           "admin_tab_levels": "Рівні",
           "admin_new_level": "Новий рівень",
           "admin_confirm_delete_level": "Видалити рівень \"{{name}}\"? Всі його уроки втратять рівень.",
+
+          // Admin categories
+          "admin_tab_categories": "Категорії",
+          "admin_new_category": "Нова категорія",
+          "admin_confirm_delete_category": "Видалити категорію \"{{name}}\"? Всі прив'язки до жестів будуть видалені.",
+          "admin_categories_title": "Категорії",
+          "admin_category_placeholder": "— категорія —",
+          "admin_synonyms_title": "Синоніми",
+          "admin_synonym_placeholder": "Новий синонім…",
 
           // Admin lessons
           "admin_tab_lessons": "Уроки",

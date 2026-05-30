@@ -7,7 +7,7 @@ import { IconSearch, IconPlus } from '../Icons';
 const PAGE_SIZE = 50;
 
 const AdminGesturesTab = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [gestures, setGestures] = useState([]);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
@@ -25,6 +25,9 @@ const AdminGesturesTab = () => {
   });
   const [synonyms, setSynonyms] = useState([]);
   const [newSynonym, setNewSynonym] = useState({ name: '', language_code: 'uk' });
+  const [gestureCategories, setGestureCategories] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [newGesture, setNewGesture] = useState({
     name_uk: '', name_en: '', description_uk: '', description_en: '',
@@ -67,6 +70,25 @@ const AdminGesturesTab = () => {
     axios.get(`${API}/api/admin/gestures/${id}/synonyms`, { headers: headers() })
       .then(res => setSynonyms(res.data)).catch(() => {});
 
+  const loadGestureCategories = (id) =>
+    axios.get(`${API}/api/admin/gestures/${id}/categories`, { headers: headers() })
+      .then(res => setGestureCategories(res.data)).catch(() => {});
+
+  const loadAllCategories = () =>
+    axios.get(`${API}/api/admin/categories`, { headers: headers() })
+      .then(res => setAllCategories(res.data)).catch(() => {});
+
+  const addGestureCategory = (gestureId) => {
+    if (!selectedCategoryId) return;
+    axios.post(`${API}/api/admin/gestures/${gestureId}/categories`, { category_id: Number(selectedCategoryId) }, { headers: headers() })
+      .then(() => { loadGestureCategories(gestureId); setSelectedCategoryId(''); })
+      .catch(fail);
+  };
+
+  const removeGestureCategory = (gestureId, gcId) =>
+    axios.delete(`${API}/api/admin/gestures/${gestureId}/categories/${gcId}`, { headers: headers() })
+      .then(() => loadGestureCategories(gestureId)).catch(fail);
+
   const addSynonym = (gestureId) => {
     if (!newSynonym.name.trim()) return;
     axios.post(`${API}/api/admin/gestures/${gestureId}/synonyms`, newSynonym, { headers: headers() })
@@ -87,6 +109,9 @@ const AdminGesturesTab = () => {
       description_en: g.description_en || '', is_dynamic: g.is_dynamic,
     });
     loadSynonyms(g.id);
+    loadGestureCategories(g.id);
+    loadAllCategories();
+    setSelectedCategoryId('');
   };
 
   const saveEdit = (id) =>
@@ -279,7 +304,7 @@ const AdminGesturesTab = () => {
                         <button className="admin-btn admin-btn--primary" onClick={() => saveEdit(g.id)}>{t('admin_save')}</button>
 
                         <div className="admin-synonyms">
-                          <div className="admin-synonyms__title">Синоніми</div>
+                          <div className="admin-synonyms__title">{t('admin_synonyms_title')}</div>
                           <div className="admin-synonyms__list">
                             {synonyms.length === 0 && (
                               <span className="admin-table__secondary">—</span>
@@ -307,12 +332,51 @@ const AdminGesturesTab = () => {
                             </select>
                             <input
                               className="admin-search"
-                              placeholder="Новий синонім…"
+                              placeholder={t('admin_synonym_placeholder')}
                               value={newSynonym.name}
                               onChange={e => setNewSynonym(p => ({ ...p, name: e.target.value }))}
                               onKeyDown={e => e.key === 'Enter' && addSynonym(g.id)}
                             />
                             <button className="admin-btn admin-btn--sm" onClick={() => addSynonym(g.id)}>
+                              <IconPlus size={24} color="var(--color-primary)" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="admin-synonyms">
+                          <div className="admin-synonyms__title">{t('admin_categories_title')}</div>
+                          <div className="admin-synonyms__list">
+                            {gestureCategories.length === 0 && (
+                              <span className="admin-table__secondary">—</span>
+                            )}
+                            {gestureCategories.map(gc => (
+                              <span key={gc.id} className="admin-synonym-tag">
+                                {gc.name}
+                                <button
+                                  className="admin-synonym-tag__remove"
+                                  onClick={() => removeGestureCategory(g.id, gc.id)}
+                                  aria-label="Remove"
+                                >&times;</button>
+                              </span>
+                            ))}
+                          </div>
+                          <div className="admin-synonyms__add">
+                            <select
+                              className="admin-filter"
+                              value={selectedCategoryId}
+                              onChange={e => setSelectedCategoryId(e.target.value)}
+                            >
+                              <option value="">{t('admin_category_placeholder')}</option>
+                              {allCategories
+                                .filter(c => c.is_active && !gestureCategories.some(gc => gc.category_id === c.id))
+                                .map(c => (
+                                  <option key={c.id} value={c.id}>
+                                    {(i18n.language === 'uk' ? c.name_uk : c.name_en) || c.name_uk || c.name_en || `#${c.id}`}
+                                  </option>
+                                ))
+                              }
+                            </select>
+                            <button className="admin-btn admin-btn--sm" onClick={() => addGestureCategory(g.id)}>
                               <IconPlus size={24} color="var(--color-primary)" />
                             </button>
                           </div>
