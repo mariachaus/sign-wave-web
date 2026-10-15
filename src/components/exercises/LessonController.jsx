@@ -22,6 +22,7 @@ const LessonController = ({ lessonId, models, onLessonComplete, onLessonFailed, 
   const [hearts, setHearts] = useState(HEARTS_MAX);
   const [failed, setFailed] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [correctGestureIds, setCorrectGestureIds] = useState([]);
 
   useEffect(() => {
     const lang = i18n.language || 'uk';
@@ -67,11 +68,30 @@ const LessonController = ({ lessonId, models, onLessonComplete, onLessonFailed, 
   const steps = lessonData.steps;
   const currentStep = steps[currentStepIdx];
 
-  const handleStepSuccess = () => {
+ const handleStepSuccess = () => {
+    // 1. Витягуємо ID жестів залежно від типу вправи
+    let stepGestures = [];
+    if (['imitation', 'recall'].includes(currentStep.type)) {
+      stepGestures.push(currentStep.gesture?.id);
+    } else if (['quiz', 'identify'].includes(currentStep.type)) {
+      stepGestures.push(currentStep.target?.id);
+    } else if (currentStep.type === 'matching') {
+      stepGestures = currentStep.gestures.map(g => g.id);
+    }
+
+    // Відфільтруємо null на всякий випадок і додамо до загального списку
+    const validIds = stepGestures.filter(Boolean);
+    
+    // Зберігаємо в стейт так, щоб гарантовано мати актуальні дані для останнього кроку
+    const newCorrectIds = [...correctGestureIds, ...validIds];
+    setCorrectGestureIds(newCorrectIds);
+
+    // 2. Переходимо далі або завершуємо урок
     if (currentStepIdx < steps.length - 1) {
       setCurrentStepIdx(prev => prev + 1);
     } else {
-      onLessonComplete(lessonId, hearts, errors);
+      // ПЕРЕДАЄМО newCorrectIds В onLessonComplete!
+      onLessonComplete(lessonId, hearts, errors, newCorrectIds); 
     }
   };
 

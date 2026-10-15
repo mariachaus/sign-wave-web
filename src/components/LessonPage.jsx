@@ -32,7 +32,7 @@ const LessonPage = ({ models }) => {
 
   const handleExit = () => setShowExitConfirm(true);
 
-  const handleLessonComplete = async (lessonId, heartsRemaining = 0, errors = []) => {
+  const handleLessonComplete = async (lessonId, heartsRemaining = 0, errors = [], correctIds = []) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/lessons/${lessonId}/complete`, {
         method: 'POST',
@@ -40,7 +40,12 @@ const LessonPage = ({ models }) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ score: 100, errors, hearts_remaining: heartsRemaining }),
+        body: JSON.stringify({ 
+          score: 100, 
+          errors, 
+          hearts_remaining: heartsRemaining,
+          correct_gesture_ids: correctIds 
+        }),
       });
       const data = await res.json();
       setResult({
