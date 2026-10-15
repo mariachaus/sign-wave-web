@@ -160,7 +160,7 @@ const TermsPage = () => {
         <>
           <p>З питань щодо цих Умов або конфіденційності ви можете звернутись до нас:</p>
           <ul>
-            <li><strong>Email:</strong> support@signwave.app</li>
+            <li><strong>Email:</strong> mariia.chaus.oi.2022@lpnu.ua</li>
             <li><strong>Платформа:</strong> SignWave</li>
           </ul>
           <p>Ми намагаємось відповідати на всі звернення протягом 5 робочих днів.</p>
@@ -318,7 +318,7 @@ const TermsPage = () => {
         <>
           <p>For questions regarding these Terms or privacy, you may contact us:</p>
           <ul>
-            <li><strong>Email:</strong> support@signwave.app</li>
+            <li><strong>Email:</strong> mariia.chaus.oi.2022@lpnu.ua</li>
             <li><strong>Platform:</strong> SignWave</li>
           </ul>
           <p>We aim to respond to all inquiries within 5 business days.</p>
