@@ -73,6 +73,17 @@
     letter-spacing: 0.04em;
   }
 
+  &__flawless {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #ef4444;
+  }
+
   &__btn {
     width: 100%;
     padding: 12px;

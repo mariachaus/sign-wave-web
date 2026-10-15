@@ -13,26 +13,23 @@ const LessonResultPopup = ({ xpEarned, currentStreak, heartsRemaining, onClose }
         <div className="lesson-result__icon">✓</div>
         <h2 className="lesson-result__title">{t('lesson_complete')}</h2>
 
-        <div className="lesson-result__stats">
-          {xpEarned > 0 && (
+        {xpEarned > 0 && (
+          <div className="lesson-result__stats">
             <div className="lesson-result__stat">
               <span className="lesson-result__stat-icon">⚡</span>
               <span className="lesson-result__stat-value">+{xpEarned}</span>
               <span className="lesson-result__stat-label">XP</span>
             </div>
-          )}
-          <div className="lesson-result__stat">
-            <span className="lesson-result__stat-icon">🔥</span>
-            <span className="lesson-result__stat-value">{currentStreak}</span>
-            <span className="lesson-result__stat-label">{t('days_count') || 'days'}</span>
           </div>
-          {flawless && (
-            <div className="lesson-result__stat lesson-result__stat--gold">
-              <span className="lesson-result__stat-icon">💛</span>
-              <span className="lesson-result__stat-value">{t('flawless') || 'Flawless'}</span>
-            </div>
-          )}
-        </div>
+        )}
+        {flawless && (
+          <div className="lesson-result__flawless">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span>{t('flawless') || 'Flawless'}</span>
+          </div>
+        )}
 
         <button className="lesson-result__btn" onClick={onClose}>
           {t('continue') || 'Continue'}
