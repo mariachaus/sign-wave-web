@@ -22,6 +22,8 @@ import TermsPage from './components/TermsPage';
 import FlashcardsPage from './components/FlashcardsPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import FriendsPage from './components/FriendsPage';
+import PublicProfilePage from './components/PublicProfilePage';
 import API_BASE_URL from "./config/api";
 import { applyTheme, applyFontSize } from './utils/theme';
 
@@ -166,6 +168,9 @@ function App() {
           <Route path="/achievements" element={<PrivateRoute token={token} isLoaded={isLoaded}><AchievementsPage /></PrivateRoute>} />
           <Route path="/flashcards" element={<PrivateRoute token={token} isLoaded={isLoaded}><FlashcardsPage /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute token={token} isLoaded={isLoaded}><AdminPage /></PrivateRoute>} />
+
+          <Route path="/friends" element={<PrivateRoute token={token} isLoaded={isLoaded}><FriendsPage /></PrivateRoute>} />
+          <Route path="/users/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><PublicProfilePage /></PrivateRoute>} />
           
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

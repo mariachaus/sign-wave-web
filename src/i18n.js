@@ -276,7 +276,10 @@ i18n
           "admin_new_gesture": "New gesture",
           "admin_col_name": "Name (EN)",
           "admin_col_model_label_req": "Model label *",
-          "admin_col_video_url_req": "Video URL *",
+          "admin_col_video_url_req": "Video URL",
+          "admin_uploading": "Uploading…",
+          "admin_drop_or_choose": "Choose or drop an image",
+          "admin_choose_file": "Choose file",
           "admin_error_generic": "Something went wrong",
           "admin_filter_all_roles": "All roles",
           "admin_filter_all_statuses": "All statuses",
@@ -401,6 +404,8 @@ i18n
           "welcome_feature_gamification": "Streaks, achievements and daily tasks",
           "welcome_get_started": "Get Started",
           "welcome_already_account": "Already have an account?",
+
+          "friends": "Friends"
         }
       },
       uk: {
@@ -673,7 +678,10 @@ i18n
           "admin_new_gesture": "Новий жест",
           "admin_col_name": "Назва (EN)",
           "admin_col_model_label_req": "Мітка моделі *",
-          "admin_col_video_url_req": "Відео URL *",
+          "admin_col_video_url_req": "Відео URL",
+          "admin_uploading": "Завантаження…",
+          "admin_drop_or_choose": "Оберіть або перетягніть зображення",
+          "admin_choose_file": "Обрати файл",
           "admin_error_generic": "Щось пішло не так",
           "admin_filter_all_roles": "Всі ролі",
           "admin_filter_all_statuses": "Всі статуси",
@@ -798,6 +806,8 @@ i18n
           "welcome_feature_gamification": "Стріки, досягнення та щоденні завдання",
           "welcome_get_started": "Почати",
           "welcome_already_account": "Вже є акаунт?",
+
+          "friends": "Друзі"
         }
       }
     },
