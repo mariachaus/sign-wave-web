@@ -14,9 +14,6 @@ import { exportLandmarksToVector } from '../utils/csv_manager';
 
 import { IconPlay, IconPlus, IconCheck, IconLoader } from './Icons';
 
-// ============================================================================
-// 1. ДОЧІРНІЙ КОМПОНЕНТо
-// ============================================================================
 
 const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, handModel, onAddSequence, onRemove }) => {
   const { t } = useTranslation();
@@ -177,9 +174,6 @@ const SingleVideoProcessor = ({ file, gestureLabel, sequenceLength, poseModel, h
 };
 
 
-// ============================================================================
-// 2. БАТЬКІВСЬКИЙ КОМПОНЕНТ: Керує списком файлів
-// ============================================================================
 const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
   const { t } = useTranslation();
   const [files, setFiles] = useState([]);
@@ -268,7 +262,7 @@ const BatchVideoUploadBlock = ({ poseModel, handModel, onAddSequence }) => {
       {files.length > 0 && (
         <div className="upload-grid">
           <div className="upload-grid__actions">
-            <button className="upload-grid__clear-btn" onClick={() => setFiles([])}>Clear all</button>
+            <button className="upload-grid__clear-btn" onClick={() => setFiles([])}>{t("clear_all")}</button>
             <span className="upload-grid__count">{files.length} video{files.length > 1 ? 's' : ''}</span>
           </div>
           <div className="upload-grid__list">

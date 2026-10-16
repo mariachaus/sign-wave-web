@@ -409,7 +409,7 @@ const VideoInferenceBlock = ({ poseModel, handModel }) => {
             {runningAll ? t('vib_running') : t('vib_run_all', { count: files.length })}
           </button>
           <button className="vib__clear-btn" onClick={() => { setFiles([]); itemRefs.current = []; }} disabled={runningAll}>
-            {t('vib_clear_all')}
+            {t('clear_all')}
           </button>
           <span className="vib__count">{t(files.length > 1 ? 'vib_count_plural' : 'vib_count', { count: files.length })}</span>
         </div>
