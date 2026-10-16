@@ -33,8 +33,27 @@ const AdminGesturesTab = () => {
     name_uk: '', name_en: '', description_uk: '', description_en: '',
     model_label: '', video_url: '', is_dynamic: false,
   });
+  const [uploadingField, setUploadingField] = useState(null);
 
   const fail = (err) => setErrorMsg(err.response?.data?.detail || t('admin_error_generic'));
+
+  const uploadGestureImage = async (file, imageType, gestureId, onSuccess) => {
+    setUploadingField(imageType);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await axios.post(
+        `${API}/api/admin/upload-gesture-image?image_type=${imageType}&gesture_id=${gestureId}`,
+        formData,
+        { headers: { ...headers(), 'Content-Type': 'multipart/form-data' } }
+      );
+      onSuccess(res.data.url);
+    } catch (e) {
+      fail(e);
+    } finally {
+      setUploadingField(null);
+    }
+  };
 
   const load = useCallback((p = page) => {
     const params = { search: debouncedSearch, skip: p * PAGE_SIZE, limit: PAGE_SIZE };
@@ -281,28 +300,74 @@ const AdminGesturesTab = () => {
                               onChange={e => setEditFields(p => ({ ...p, description_en: e.target.value }))} />
                           </label>
                         </div>
-                        <label>
-                          {t('admin_label_video_url')}
-                          <input type="text" value={editFields.video_url} placeholder="https://…"
-                            onChange={e => setEditFields(p => ({ ...p, video_url: e.target.value }))} />
-                        </label>
-                        <label>
-                          {t('admin_label_illustration_url')}
-                          <input type="text" value={editFields.illustration_url} placeholder="https://…"
-                            onChange={e => setEditFields(p => ({ ...p, illustration_url: e.target.value }))} />
-                        </label>
-                        <label>
-                          {t('admin_label_thumbnail_url')}
-                          <input type="text" value={editFields.thumbnail_url} placeholder="https://…"
-                            onChange={e => setEditFields(p => ({ ...p, thumbnail_url: e.target.value }))} />
-                        </label>
-                        <label style={{ gap: '6px' }}>
-                          <input type="checkbox" checked={editFields.is_dynamic}
-                            onChange={e => setEditFields(p => ({ ...p, is_dynamic: e.target.checked }))} />
-                          {t('admin_col_dynamic')}
-                        </label>
-                        <button className="admin-btn admin-btn--primary" onClick={() => saveEdit(g.id)}>{t('admin_save')}</button>
-
+                        <div className="admin-form__row">
+                          <label>
+                            {t('admin_label_video_url')}
+                            <input type="text" value={editFields.video_url} placeholder="https://…"
+                              onChange={e => setEditFields(p => ({ ...p, video_url: e.target.value }))} />
+                          </label>
+                          <label style={{ gap: '6px', flex: 'none' }}>
+                            <input type="checkbox" checked={editFields.is_dynamic}
+                              onChange={e => setEditFields(p => ({ ...p, is_dynamic: e.target.checked }))} />
+                            {t('admin_col_dynamic')}
+                          </label>
+                        </div>
+                        <div className="admin-form__row">
+                          <label className="admin-label--col">
+                            {t('admin_label_illustration_url')}
+                            <div className="admin-image-upload">
+                              <div className="admin-image-upload__dropzone">
+                                {editFields.illustration_url && (
+                                  <img src={editFields.illustration_url} className="admin-image-upload__preview" alt="" />
+                                )}
+                                <p className="admin-image-upload__hint">
+                                  {uploadingField === 'illustration' ? t('admin_uploading') : t('admin_drop_or_choose')}
+                                </p>
+                                <label className="admin-image-upload__add-btn">
+                                  <IconPlus size={16} /> {t('admin_choose_file')}
+                                  <input type="file" hidden accept="image/jpeg,image/png,image/webp"
+                                    disabled={!!uploadingField}
+                                    onChange={e => {
+                                      const f = e.target.files[0];
+                                      if (f) uploadGestureImage(f, 'illustration', g.id, url => setEditFields(p => ({ ...p, illustration_url: url })));
+                                      e.target.value = '';
+                                    }} />
+                                </label>
+                              </div>
+                              {editFields.illustration_url && (
+                                <input className="admin-image-upload__url" type="text" value={editFields.illustration_url} placeholder="https://…"
+                                  onChange={e => setEditFields(p => ({ ...p, illustration_url: e.target.value }))} />
+                              )}
+                            </div>
+                          </label>
+                          <label className="admin-label--col">
+                            {t('admin_label_thumbnail_url')}
+                            <div className="admin-image-upload">
+                              <div className="admin-image-upload__dropzone">
+                                {editFields.thumbnail_url && (
+                                  <img src={editFields.thumbnail_url} className="admin-image-upload__preview" alt="" />
+                                )}
+                                <p className="admin-image-upload__hint">
+                                  {uploadingField === 'thumbnail' ? t('admin_uploading') : t('admin_drop_or_choose')}
+                                </p>
+                                <label className="admin-image-upload__add-btn">
+                                  <IconPlus size={16} /> {t('admin_choose_file')}
+                                  <input type="file" hidden accept="image/jpeg,image/png,image/webp"
+                                    disabled={!!uploadingField}
+                                    onChange={e => {
+                                      const f = e.target.files[0];
+                                      if (f) uploadGestureImage(f, 'thumbnail', g.id, url => setEditFields(p => ({ ...p, thumbnail_url: url })));
+                                      e.target.value = '';
+                                    }} />
+                                </label>
+                              </div>
+                              {editFields.thumbnail_url && (
+                                <input className="admin-image-upload__url" type="text" value={editFields.thumbnail_url} placeholder="https://…"
+                                  onChange={e => setEditFields(p => ({ ...p, thumbnail_url: e.target.value }))} />
+                              )}
+                            </div>
+                          </label>
+                        </div>
                         <div className="admin-synonyms">
                           <div className="admin-synonyms__title">{t('admin_synonyms_title')}</div>
                           <div className="admin-synonyms__list">
@@ -381,6 +446,7 @@ const AdminGesturesTab = () => {
                             </button>
                           </div>
                         </div>
+                        <button className="admin-btn admin-btn--primary" onClick={() => saveEdit(g.id)}>{t('admin_save')}</button>
                       </div>
                     </td>
                   </tr>

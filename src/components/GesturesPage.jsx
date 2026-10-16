@@ -65,10 +65,10 @@ const GesturesPage = () => {
         <IconSearch />
         <input
           className="gestures-search"
-          type="text"
+          type="search"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder={t('search_gestures') || 'Пошук жестів…'}
+          placeholder={t('search_gestures')}
         />
       </div>
 

@@ -8,17 +8,19 @@
 
 .gestures-page .search-wrap {
   margin-bottom: 28px;
+  width: 100%;
 }
 
 .gestures-search {
-  background: var(--color-surface-alt);
+  width: 100%;
+  padding: 11px 16px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
   color: var(--color-text);
-  padding: 8px 12px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-family: inherit;
-  width: 280px;
+  transition: border-color var(--transition);
 
   &::placeholder { color: var(--color-text-muted); }
   &:focus { outline: none; border-color: var(--color-primary); }
@@ -151,6 +153,7 @@
   gap: 20px;
   justify-content: flex-start;
 }
+
 
 @media (max-width: 640px) {
   .gestures-page { padding: 20px; }
