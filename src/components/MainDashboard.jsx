@@ -11,13 +11,10 @@ const HERO_SIGNS = [
 
 import { IconDownload, IconFlame, IconStar } from './Icons';
 import axios from 'axios';
-import ImageBlock from './ImageBlock';
-import WebcamAnalyzer from './WebcamAnalyzer';
-import VideoUploadBlock from './VideoUploadBlock';
-import VideoInferenceBlock from './VideoInferenceBlock';
+
 import Sidebar from './Sidebar';
-import { downloadCSVDataset } from '../utils/csv_manager';
-import { downloadJSONDataset } from '../utils/json_manager';
+
+import MLTools from './MLTools';
 import API_BASE_URL from '../config/api';
 import '../styles/pages/MainDashboard.scss';
 
@@ -305,160 +302,132 @@ const MainDashboard = ({ models, isAdmin, isAuthenticated, isLoaded }) => {
       <Sidebar isAdmin={isAdmin} activeTab={tab} onTabChange={setTab} />
 
       <main className="dashboard-main">
-      <div className="dashboard-widgets">
+      {!['image', 'webcam', 'videoData', 'inferenceTest'].includes(tab) && (
+        <div className="dashboard-widgets">
 
-        {/* Stats row */}
-        <div className="widgets-stats-row">
-          <div className="widget-stat widget-stat--streak">
-            <span className="widget-stat__icon"><IconFlame /></span>
-            <div>
-              <div className="widget-stat__value">{streak ? streak.current_streak : 0}</div>
-              <div className="widget-stat__label">{t('current_streak')}</div>
-            </div>
-            {streak?.freeze_shields > 0 && (
-              <div className="widget-stat__badge shield-badge">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                ×{streak.freeze_shields}
-                <div className="shield-badge__popup">
-                  <p className="shield-badge__popup-title">{t('shield_info_title')}</p>
-                  <ul className="shield-badge__popup-list">
-                    <li>{t('shield_info_tip1')}</li>
-                    <li>{t('shield_info_tip2')}</li>
-                    <li>{t('shield_info_tip3')}</li>
-                  </ul>
-                </div>
+          {/* Stats row */}
+          <div className="widgets-stats-row">
+            <div className="widget-stat widget-stat--streak">
+              <span className="widget-stat__icon"><IconFlame /></span>
+              <div>
+                <div className="widget-stat__value">{streak ? streak.current_streak : 0}</div>
+                <div className="widget-stat__label">{t('current_streak')}</div>
               </div>
-            )}
-          </div>
-          <div className="widget-stat widget-stat--xp">
-            <span className="widget-stat__icon"><IconStar /></span>
-            <div>
-              <div className="widget-stat__value">{totalXP.toLocaleString()}</div>
-              <div className="widget-stat__label">XP {t('earned') || 'earned'}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Continue lesson */}
-        {nextLesson && (
-          <div className="widget-next-lesson">
-            <div className="widget-next-lesson__text">
-              <div className="widget-next-lesson__meta">{nextLesson.level_name}</div>
-              <div className="widget-next-lesson__name">{nextLesson.lesson_name}</div>
-            </div>
-            <button
-              className="widget-next-lesson__btn"
-              onClick={() => navigate(`/lesson/${nextLesson.lesson_id}`)}
-            >
-              {t('continue')} →
-            </button>
-          </div>
-        )}
-
-        {/* Daily tasks */}
-        {dailyTasks.length > 0 && (
-          <div className="widget-daily-tasks">
-            <div className="widget-daily-tasks__header">
-              <span>{t('daily_tasks')}</span>
-              <span className="widget-daily-tasks__count">
-                {dailyTasks.filter(t => t.is_completed).length}/{dailyTasks.length}
-              </span>
-            </div>
-            <div className="widget-daily-tasks__progress">
-              <div
-                className="widget-daily-tasks__progress-fill"
-                style={{ width: `${(dailyTasks.filter(t => t.is_completed).length / dailyTasks.length) * 100}%` }}
-              />
-            </div>
-            {dailyTasks.map(task => (
-              <div key={task.id} className={`daily-task${task.is_completed ? ' daily-task--done' : ''}`}>
-                <div className="daily-task__left">
-                  <div className="daily-task__checkbox">
-                    {task.is_completed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+              {streak?.freeze_shields > 0 && (
+                <div className="widget-stat__badge shield-badge">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  ×{streak.freeze_shields}
+                  <div className="shield-badge__popup">
+                    <p className="shield-badge__popup-title">{t('shield_info_title')}</p>
+                    <ul className="shield-badge__popup-list">
+                      <li>{t('shield_info_tip1')}</li>
+                      <li>{t('shield_info_tip2')}</li>
+                      <li>{t('shield_info_tip3')}</li>
+                    </ul>
                   </div>
-                  <span className="daily-task__label">{taskLabel(task)}</span>
                 </div>
-                <div className="daily-task__right">
-                  <div className="daily-task__bar-wrap">
-                    <div
-                      className="daily-task__bar"
-                      style={{ width: `${task.is_completed ? 100 : Math.min(100, Math.round(((task.current_value || 0) / (task.target_value || 1)) * 100))}%` }}
-                    />
-                  </div>
-                  <span className="daily-task__xp">+{task.xp_reward} XP</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Sign of the day */}
-        {dailyGesture && (
-          <div className="widget-god">
-            <div className="widget-god__chip">{t('gesture_of_day')}</div>
-            <div className="widget-god__content">
-              {dailyGesture.illustration_url ? (
-                <img src={dailyGesture.illustration_url} alt={dailyGesture.name} className="widget-god__thumb" />
-              ) : (
-                <div className="widget-god__thumb-placeholder">🤟</div>
               )}
-              <div className="widget-god__info">
-                <div className="widget-god__name">{dailyGesture.name}</div>
-                <button className="widget-god__btn" onClick={() => navigate(`/gestures/${dailyGesture.id}`)}>
-                  {t('view_details')}
-                </button>
+            </div>
+            <div className="widget-stat widget-stat--xp">
+              <span className="widget-stat__icon"><IconStar /></span>
+              <div>
+                <div className="widget-stat__value">{totalXP.toLocaleString()}</div>
+                <div className="widget-stat__label">XP {t('earned') || 'earned'}</div>
               </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {isAdmin && <section id="demos">
-        {tab === 'image' && (
-          <div className="dashboard-content image-mode">
-            <h1>{t('image_detection')}</h1>
-            <ImageBlock
-              poseModel={models.image.pose}
-              handModel={models.image.hand}
-              onAddRecord={(r) => setImageDataset(prev => [...prev, r])}
-            />
-            <button className="download-btn" onClick={() => downloadCSVDataset(imageDataset)}>
-              <IconDownload /> {t('download_csv')}
-            </button>
-          </div>
-        )}
+          {/* Continue lesson */}
+          {nextLesson && (
+            <div className="widget-next-lesson">
+              <div className="widget-next-lesson__text">
+                <div className="widget-next-lesson__meta">{nextLesson.level_name}</div>
+                <div className="widget-next-lesson__name">{nextLesson.lesson_name}</div>
+              </div>
+              <button
+                className="widget-next-lesson__btn"
+                onClick={() => navigate(`/lesson/${nextLesson.lesson_id}`)}
+              >
+                {t('continue')} →
+              </button>
+            </div>
+          )}
 
-        {tab === 'webcam' && (
-          <div className="dashboard-content webcam-mode">
-            <h1>{t('live_testing')}</h1>
-            <WebcamAnalyzer poseModel={models.video.pose} handModel={models.video.hand} isMirror={localStorage.getItem('mirror_view') !== 'false'} />
-          </div>
-        )}
+          {/* Daily tasks */}
+          {dailyTasks.length > 0 && (
+            <div className="widget-daily-tasks">
+              <div className="widget-daily-tasks__header">
+                <span>{t('daily_tasks')}</span>
+                <span className="widget-daily-tasks__count">
+                  {dailyTasks.filter(t => t.is_completed).length}/{dailyTasks.length}
+                </span>
+              </div>
+              <div className="widget-daily-tasks__progress">
+                <div
+                  className="widget-daily-tasks__progress-fill"
+                  style={{ width: `${(dailyTasks.filter(t => t.is_completed).length / dailyTasks.length) * 100}%` }}
+                />
+              </div>
+              {dailyTasks.map(task => (
+                <div key={task.id} className={`daily-task${task.is_completed ? ' daily-task--done' : ''}`}>
+                  <div className="daily-task__left">
+                    <div className="daily-task__checkbox">
+                      {task.is_completed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                    </div>
+                    <span className="daily-task__label">{taskLabel(task)}</span>
+                  </div>
+                  <div className="daily-task__right">
+                    <div className="daily-task__bar-wrap">
+                      <div
+                        className="daily-task__bar"
+                        style={{ width: `${task.is_completed ? 100 : Math.min(100, Math.round(((task.current_value || 0) / (task.target_value || 1)) * 100))}%` }}
+                      />
+                    </div>
+                    <span className="daily-task__xp">+{task.xp_reward} XP</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
-        {tab === 'videoData' && (
-          <div className="dashboard-content video-data-mode">
-            <h1>{t('extract_sequences')}</h1>
-            <VideoUploadBlock
-              poseModel={models.video.pose}
-              handModel={models.video.hand}
-              onAddSequence={(s) => setVideoDataset(prev => [...prev, s])}
-            />
-            <button className="download-btn" onClick={() => downloadJSONDataset(videoDataset)}>
-              <IconDownload /> {t('download_json')}{videoDataset.length > 0 && ` (${videoDataset.length})`}
-            </button>
-          </div>
+          {/* Sign of the day */}
+          {dailyGesture && (
+            <div className="widget-god">
+              <div className="widget-god__chip">{t('gesture_of_day')}</div>
+              <div className="widget-god__content">
+                {dailyGesture.illustration_url ? (
+                  <img src={dailyGesture.illustration_url} alt={dailyGesture.name} className="widget-god__thumb" />
+                ) : (
+                  <div className="widget-god__thumb-placeholder">🤟</div>
+                )}
+                <div className="widget-god__info">
+                  <div className="widget-god__name">{dailyGesture.name}</div>
+                  <button className="widget-god__btn" onClick={() => navigate(`/gestures/${dailyGesture.id}`)}>
+                    {t('view_details')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+        {isAdmin && (
+          <>
+            {['image', 'webcam', 'videoData', 'inferenceTest'].includes(tab) ? (
+              <section id="demos">
+                <MLTools
+                  tab={tab}
+                  models={models}
+                  imageDataset={imageDataset}
+                  setImageDataset={setImageDataset}
+                  videoDataset={videoDataset}
+                  setVideoDataset={setVideoDataset}
+                />
+              </section>
+            ) : null}
+          </>
         )}
-
-        {tab === 'inferenceTest' && (
-          <div className="dashboard-content">
-            <h1>Video Inference Test</h1>
-            <VideoInferenceBlock
-              poseModel={models.video.pose}
-              handModel={models.video.hand}
-            />
-          </div>
-        )}
-      </section>}
       </main>
     </div>
   );

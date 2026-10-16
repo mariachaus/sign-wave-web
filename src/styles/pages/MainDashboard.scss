@@ -466,7 +466,6 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 20px;
   padding: 9px 20px;
   background: var(--color-surface-alt);
   color: var(--color-text);
@@ -1136,4 +1135,11 @@
   .widgets-stats-row { gap: 10px; }
   .widget-stat { padding: 13px 14px; gap: 10px; }
   .widget-stat__value { font-size: 1.25rem; }
+}
+
+.dataset-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
 }
