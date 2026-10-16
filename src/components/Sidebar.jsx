@@ -102,7 +102,7 @@ const Sidebar = ({ isAdmin = false, activeTab = null, onTabChange = null }) => {
   };
 
   const mlTabs = [
-    { id: 'image', icon: ICONS.image, label: t('tab_image') },
+    // { id: 'image', icon: ICONS.image, label: t('tab_image') },
     { id: 'webcam', icon: ICONS.webcam, label: t('tab_webcam') },
     { id: 'videoData', icon: ICONS.videoData, label: t('tab_video_data') },
     { id: 'inferenceTest', icon: ICONS.inference, label: 'Inference Test' },
