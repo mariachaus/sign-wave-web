@@ -3,11 +3,11 @@ import axios from 'axios';
 import API_BASE_URL from "../config/api";
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import defaultAvatar from "../assets/default-avatar.jpg";
+import UserAvatar from './UserAvatar';
 import AchievementItem from './AchievementItem';
 import StreakCalendar from './StreakCalendar';
 import '../styles/pages/ProfilePage.scss';
-import { IconFlame, IconBolt, IconHand, IconStar, IconBack, IconSettings, IconEdit } from './Icons';
+import { IconFlame, IconBolt, IconHand, IconStar, IconBack, IconSettings, IconEdit, IconAchievement } from './Icons';
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -56,7 +56,7 @@ const ProfilePage = () => {
     </div>
   );
 
-  const avatarImage = profile.avatar_url || defaultAvatar;
+  
 
   const handleAvatarClick = () => fileInputRef.current?.click();
 
@@ -106,35 +106,35 @@ const ProfilePage = () => {
       </div>
 
       {/* ── User card ── */}
-      <div className="profile-user-card">
-        <div
-          className={`profile-user-card__avatar ${avatarUploading ? 'profile-user-card__avatar--uploading' : ''}`}
-          onClick={handleAvatarClick}
-          title="Change avatar"
-        >
-          <img src={avatarImage} alt="avatar" onError={e => { e.target.src = defaultAvatar; }} />
-          <div className="profile-user-card__avatar-overlay">
-            {avatarUploading
-              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            }
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            style={{ display: 'none' }}
-            onChange={handleAvatarChange}
-          />
-        </div>
-        <div className="profile-user-card__info">
-          <h2 className="profile-user-card__name">{profile.username}</h2>
-          <p className="profile-user-card__joined">{t('joined')} {profile.joined_at}</p>
-        </div>
-        <button className="profile-edit-btn" onClick={() => navigate('/settings', { state: { tab: 'personal' } })}>
-          <IconEdit /> {t('edit') || 'Edit'}
-        </button>
+     <div className="profile-user-card">
+  <UserAvatar
+    user={profile}
+    size={96}
+    editable
+    uploading={avatarUploading}
+    onClick={handleAvatarClick}
+    inputRef={fileInputRef}
+    onChange={handleAvatarChange}
+  />
+
+    <div className="profile-user-card__info">
+        <h2 className="profile-user-card__name">
+          {profile.username}
+        </h2>
+        <p className="profile-user-card__joined">
+          {t('joined')} {profile.joined_at}
+        </p>
       </div>
+
+      <button
+        className="profile-edit-btn"
+        onClick={() =>
+          navigate('/settings', { state: { tab: 'personal' } })
+        }
+      >
+        <IconEdit /> {t('edit') || 'Edit'}
+      </button>
+    </div>
 
       {/* ── Stats 2×2 ── */}
       <div className="profile-stats-grid">
@@ -158,7 +158,7 @@ const ProfilePage = () => {
       {/* ── Achievements ── */}
       <div className="profile-achievements-header">
         <h3 className="profile-section-title" style={{ margin: 0 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(74% 0.18 55)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', marginRight: 6, marginBottom: 2 }}><path d="M18 2H6v7a6 6 0 0 0 12 0V2z" fill="oklch(74% 0.18 55)" fillOpacity="0.2"/><path d="M10 14.66L7 22H17L14 14.66Z" fill="oklch(74% 0.18 55)" fillOpacity="0.2" stroke="none"/><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          <span className="public-profile__stat-icon"><IconAchievement /></span>
           {t('achievements')}
         </h3>
         <button className="profile-view-all" onClick={() => navigate('/achievements')}>
