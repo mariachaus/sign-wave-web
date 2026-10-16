@@ -408,7 +408,7 @@ i18n
 
           //Friends
           "friends": "Friends",
-          "friends_search_placeholder": 'Find a user by username...',
+          "friends_search_placeholder": 'Find a user by name...',
           "friends_search_hint": 'Type at least 2 characters',
           "friends_search_empty": 'No users found',
           "friends_loading": 'Loading…',
@@ -837,14 +837,14 @@ i18n
 
           //Friends
           "friends": "Друзі",
-          "friends_search_placeholder": "Знайти користувача за username...",
+          "friends_search_placeholder": "Знайти користувача за іменем...",
           "friends_search_hint": 'Введіть щонайменше 2 символи',
           "friends_search_empty": 'Нікого не знайдено',
           "friends_loading": 'Завантаження…',
           "friends_tab_friends": 'Друзі',
           "friends_tab_requests": 'Запити',
           "friends_empty": 'Поки що немає друзів',
-          "friends_empty_hint": "Шукайте людей за їхнім username",
+          "friends_empty_hint": "Шукайте людей за їхнім іменем.",
           "friends_incoming": 'Вхідні запити',
           "friends_outgoing": 'Надіслані запити',
           "friends_requests_empty": 'Немає запитів',
