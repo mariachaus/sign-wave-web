@@ -56,6 +56,7 @@ i18n
           "click_to_detect": "Click on the image to detect",
           "add_to_csv": "Add to CSV",
           "added_to_csv": "Added!",
+          "clear_json": "Clear JSON",
 
           // Settings
           "settings": "Settings",
@@ -207,7 +208,7 @@ i18n
           "vib_add_videos": "Add files",
           "vib_run_all": "Run All ({{count}})",
           "vib_running": "Running…",
-          "vib_clear_all": "Clear all",
+          "clear_all": "Clear all",
           "vib_count": "{{count}} video",
           "vib_count_plural": "{{count}} videos",
           "vib_run": "Run",
@@ -405,7 +406,33 @@ i18n
           "welcome_get_started": "Get Started",
           "welcome_already_account": "Already have an account?",
 
-          "friends": "Friends"
+          //Friends
+          "friends": "Friends",
+          "friends_search_placeholder": 'Find a user by username...',
+          "friends_search_hint": 'Type at least 2 characters',
+          "friends_search_empty": 'No users found',
+          "friends_loading": 'Loading…',
+          "friends_tab_friends": 'Friends',
+          "friends_tab_requests": 'Requests',
+          "friends_empty": 'No friends yet',
+          "friends_empty_hint": 'Search to find people by name.',
+          "friends_incoming": 'Incoming requests',
+          "friends_outgoing": 'Sent requests',
+          "friends_requests_empty": 'No requests',
+          "friends_add": 'Add',
+          "friends_request_sent": 'Request sent',
+          "friends_accept": 'Accept',
+          "friends_decline": 'Decline',
+          "friends_cancel_request": 'Cancel request',
+          "friends_remove": 'Remove friend',
+          "friends_remove_confirm": 'Remove {{name}} from friends?',
+          "friends_status_friends": 'Friends',
+          "friends_error_generic": 'Something went wrong. Please try again.',
+          "friends_back": 'Back',
+          "friends_go_to_profile": 'Go to my profile',
+          "public_profile_gestures": 'Gestures mastered',
+          "public_profile_achievements": 'Achievements',
+          "public_profile_not_found": 'User not found',
         }
       },
       uk: {
@@ -458,6 +485,7 @@ i18n
           "click_to_detect": "Натисніть на зображення для розпізнавання",
           "add_to_csv": "Додати в CSV",
           "added_to_csv": "Додано!",
+          "clear_json": "Очистити JSON",
 
           // Settings
           "settings": "Налаштування",
@@ -545,7 +573,7 @@ i18n
           "no_description": "Опис відсутній.",
           "practice_now": "Практикувати зараз",
           "similar_gestures": "Схожі жести",
-          "search_gestures": "Пошук жестів...",
+          "search_gestures": "Знайти жести...",
 
           // Learn / Levels
           "learn": "Навчання",
@@ -609,7 +637,7 @@ i18n
           "vib_add_videos": "Додати файли",
           "vib_run_all": "Запустити все ({{count}})",
           "vib_running": "Виконується…",
-          "vib_clear_all": "Очистити все",
+          "clear_all": "Очистити все",
           "vib_count": "{{count}} відео",
           "vib_count_plural": "{{count}} відео",
           "vib_run": "Запустити",
@@ -807,7 +835,33 @@ i18n
           "welcome_get_started": "Почати",
           "welcome_already_account": "Вже є акаунт?",
 
-          "friends": "Друзі"
+          //Friends
+          "friends": "Друзі",
+          "friends_search_placeholder": "Знайти користувача за username...",
+          "friends_search_hint": 'Введіть щонайменше 2 символи',
+          "friends_search_empty": 'Нікого не знайдено',
+          "friends_loading": 'Завантаження…',
+          "friends_tab_friends": 'Друзі',
+          "friends_tab_requests": 'Запити',
+          "friends_empty": 'Поки що немає друзів',
+          "friends_empty_hint": "Шукайте людей за їхнім username",
+          "friends_incoming": 'Вхідні запити',
+          "friends_outgoing": 'Надіслані запити',
+          "friends_requests_empty": 'Немає запитів',
+          "friends_add": 'Додати',
+          "friends_request_sent": 'Запит надіслано',
+          "friends_accept": 'Прийняти',
+          "friends_decline": 'Відхилити',
+          "friends_cancel_request": 'Скасувати запит',
+          "friends_remove": 'Видалити з друзів',
+          "friends_remove_confirm": 'Видалити {{name}} з друзів?',
+          "friends_status_friends": 'Друзі',
+          "friends_error_generic": 'Щось пішло не так. Спробуйте ще раз.',
+          "friends_back": 'Назад',
+          "friends_go_to_profile": 'Перейти до мого профілю',
+          "public_profile_gestures": 'Вивчено жестів',
+          "public_profile_achievements": 'Досягнення',
+          "public_profile_not_found": 'Користувача не знайдено',
         }
       }
     },
