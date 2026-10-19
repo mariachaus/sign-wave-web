@@ -75,7 +75,7 @@ jobs:
           build-args: |
             VITE_BASE_PATH=/
             VITE_API_URL=${{ vars.VITE_API_URL || '' }}
-            VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID || '' }}
+            VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID || 'not-configured' }}
 
   deploy:
     name: Deploy to Azure VM
