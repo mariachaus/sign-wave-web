@@ -26,7 +26,6 @@ dist-ssr
 .DS_*
 **/*.backup.*
 **/*.back.*
-api.js
 bower_components
 *.sublime*
 psd
