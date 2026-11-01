@@ -4,6 +4,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGoogleLogin } from '@react-oauth/google';
 import API_BASE_URL from '../config/api';
+import PasswordHints from './PasswordHints';
+import { isPasswordValid } from '../utils/password';
+import { getApiErrorMessage } from '../utils/apiError';
 import '../styles/pages/AuthPage.scss';
 
 const UserIcon = () => (
@@ -44,6 +47,7 @@ const EyeOffIcon = () => (
 const AuthPage = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,6 +61,18 @@ const AuthPage = ({ onLoginSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!isLogin) {
+      if (!isPasswordValid(formData.password)) {
+        setError(t('error_password_weak'));
+        return;
+      }
+      if (formData.password !== confirmPassword) {
+        setError(t('error_passwords_match'));
+        return;
+      }
+    }
+
     setLoading(true);
     const path = isLogin ? 'login' : 'register';
     try {
@@ -69,13 +85,10 @@ const AuthPage = ({ onLoginSuccess }) => {
         alert('Registration successful! Please log in with your credentials.');
         setIsLogin(true);
         setFormData({ username: '', email: '', password: '' });
+        setConfirmPassword('');
       }
     } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-        err.response?.data?.error ||
-        'An error occurred. Please check your connection.'
-      );
+      setError(getApiErrorMessage(err, 'An error occurred. Please check your connection.'));
     } finally {
       setLoading(false);
     }
@@ -84,6 +97,7 @@ const AuthPage = ({ onLoginSuccess }) => {
   const switchMode = () => {
     setIsLogin(v => !v);
     setError('');
+    setConfirmPassword('');
     setAgreedToTerms(false);
   };
 
@@ -206,7 +220,30 @@ const AuthPage = ({ onLoginSuccess }) => {
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
+            {!isLogin && <PasswordHints password={formData.password} />}
           </div>
+
+          {/* Confirm password — register only */}
+          {!isLogin && (
+            <div className="auth-field">
+              <label className="auth-field__label">{t('confirm_password')}</label>
+              <div className="auth-field__wrap">
+                <span className="auth-field__icon"><LockIcon /></span>
+                <input
+                  className="auth-field__input auth-field__input--pw"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+              </div>
+              {confirmPassword && confirmPassword !== formData.password && (
+                <p className="pw-mismatch">{t('error_passwords_match')}</p>
+              )}
+            </div>
+          )}
 
           {isLogin && (
             <div className="auth-forgot">

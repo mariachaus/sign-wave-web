@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import API_BASE_URL from '../config/api';
+import PasswordHints from './PasswordHints';
+import { isPasswordValid } from '../utils/password';
+import { getApiErrorMessage } from '../utils/apiError';
 import '../styles/pages/AuthPage.scss';
 
 const LockIcon = () => (
@@ -59,6 +62,10 @@ const ResetPasswordPage = () => {
     e.preventDefault();
     setError('');
 
+    if (!isPasswordValid(newPassword)) {
+      setError(t('error_password_weak'));
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError(t('error_passwords_match'));
       return;
@@ -76,7 +83,7 @@ const ResetPasswordPage = () => {
       setError(
         detail === 'Invalid or expired token'
           ? t('reset_password_invalid')
-          : t('admin_error_generic')
+          : getApiErrorMessage(err, t('admin_error_generic'))
       );
     } finally {
       setLoading(false);
@@ -122,6 +129,7 @@ const ResetPasswordPage = () => {
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
+              <PasswordHints password={newPassword} />
             </div>
 
             <div className="auth-field">
@@ -139,6 +147,9 @@ const ResetPasswordPage = () => {
                   required
                 />
               </div>
+              {confirmPassword && confirmPassword !== newPassword && (
+                <p className="pw-mismatch">{t('error_passwords_match')}</p>
+              )}
             </div>
 
             <button type="submit" className="auth-submit" disabled={loading}>
