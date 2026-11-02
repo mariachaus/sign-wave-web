@@ -1,0 +1,46 @@
+.friends-locked {
+  max-width: 420px;
+  margin: 64px auto;
+  padding: 32px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text);
+  text-align: center;
+}
+
+.friends-locked__icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.friends-locked__title {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.friends-locked__text {
+  margin: 0 0 20px;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.friends-locked__btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+
+  &:hover { background: var(--color-primary-dark); }
+}
+
+@media (max-width: 600px) {
+  .friends-locked { margin: 32px 16px; }
+}

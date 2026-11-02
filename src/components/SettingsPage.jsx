@@ -26,6 +26,9 @@ import { useTranslation } from 'react-i18next';
 import API_BASE_URL from "../config/api";
 import WebcamAnalyzer from './WebcamAnalyzer';
 import ConfirmModal from './ConfirmModal';
+import PasswordHints from './PasswordHints';
+import { isPasswordValid } from '../utils/password';
+import { getApiErrorMessage } from '../utils/apiError';
 import { IconUser, IconGlobe, IconMoon, IconMail, IconCamera, IconTextSize } from './Icons';
 import { applyTheme, applyFontSize } from '../utils/theme';
 import '../styles/pages/SettingsPage.scss';
@@ -167,6 +170,10 @@ const SettingsPage = ({ models }) => {
   };
 
   const handleChangePassword = async () => {
+    if (!isPasswordValid(passwordData.new_password)) {
+      showStatus(t('error_password_weak'), 'error');
+      return;
+    }
     if (passwordData.new_password !== passwordData.confirm_password) {
       showStatus(t('error_passwords_match'), 'error');
       return;
@@ -180,7 +187,7 @@ const SettingsPage = ({ models }) => {
       showStatus(t('status_password_changed'), 'success');
       setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
     } catch (err) {
-      showStatus(err.response?.data?.error || "Password change failed", 'error');
+      showStatus(getApiErrorMessage(err, "Password change failed"), 'error');
     }
   };
 
@@ -330,7 +337,8 @@ const SettingsPage = ({ models }) => {
             { placeholder: t('new_password'),     key: 'new_password',     isFirst: false },
             { placeholder: t('confirm_password'), key: 'confirm_password', isFirst: false },
           ].map(({ placeholder, key, isFirst }) => (
-            <div key={key} className="settings-pw-wrap">
+            <React.Fragment key={key}>
+            <div className="settings-pw-wrap">
               <input
                 className="settings-input"
                 type={showPasswords ? 'text' : 'password'}
@@ -349,6 +357,14 @@ const SettingsPage = ({ models }) => {
                 </button>
               )}
             </div>
+            {key === 'new_password' && passwordData.new_password && (
+              <PasswordHints password={passwordData.new_password} />
+            )}
+            {key === 'confirm_password' && passwordData.confirm_password &&
+              passwordData.confirm_password !== passwordData.new_password && (
+              <p className="pw-mismatch">{t('error_passwords_match')}</p>
+            )}
+            </React.Fragment>
           ))}
           <button className="save-btn" onClick={handleChangePassword}>{t('save_password')}</button>
         </div>
