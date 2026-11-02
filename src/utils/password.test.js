@@ -36,15 +36,16 @@ describe('PASSWORD_RULES', () => {
 });
 
 describe('getApiErrorMessage', () => {
-  it('returns a string detail as is', () => {
-    const err = { response: { data: { detail: 'Incorrect old password' } } };
+  it('returns the error message of an HTTPException', () => {
+    const err = { response: { data: { error: 'Incorrect old password' } } };
     expect(getApiErrorMessage(err, 'fallback')).toBe('Incorrect old password');
   });
 
-  it('joins FastAPI validation errors', () => {
-    const err = { response: { data: { detail: [
-      { msg: 'Value error, Password must contain at least one digit' },
-    ] } } };
+  it('returns validation details instead of the generic 422 message', () => {
+    const err = { response: { data: {
+      error: 'Validation error',
+      details: [{ msg: 'Value error, Password must contain at least one digit' }],
+    } } };
     expect(getApiErrorMessage(err, 'fallback')).toBe('Password must contain at least one digit');
   });
 

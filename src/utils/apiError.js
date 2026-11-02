@@ -1,8 +1,11 @@
+// Backend error format (see exception handlers in sign-wave-backend/server.py):
+//   HTTPException → { error: "message" }
+//   422           → { error: "Validation error", details: [{ msg, ... }] }
 export const getApiErrorMessage = (err, fallback) => {
-  const detail = err.response?.data?.detail;
-  if (typeof detail === 'string') return detail;
-  if (Array.isArray(detail) && detail.length) {
-    return detail.map(d => String(d.msg || '').replace(/^Value error, /, '')).join('. ');
+  const data = err.response?.data;
+  if (Array.isArray(data?.details) && data.details.length) {
+    return data.details.map(d => String(d.msg || '').replace(/^Value error, /, '')).join('. ');
   }
-  return err.response?.data?.error || fallback;
+  if (typeof data?.error === 'string') return data.error;
+  return fallback;
 };

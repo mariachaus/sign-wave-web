@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // Імпортуємо хук для зміни мови
 
@@ -22,6 +22,9 @@ import TermsPage from './components/TermsPage';
 import FlashcardsPage from './components/FlashcardsPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import VerifyEmailPage from './components/VerifyEmailPage';
+import EmailVerificationBanner from './components/EmailVerificationBanner';
+import FriendsLockedNotice from './components/FriendsLockedNotice';
 import FriendsPage from './components/FriendsPage';
 import PublicProfilePage from './components/PublicProfilePage';
 import API_BASE_URL from "./config/api";
@@ -47,6 +50,16 @@ function App() {
   const [models, setModels] = useState({ image: { pose: null, hand: null }, video: { pose: null, hand: null } });
   const [isLoaded, setIsLoaded] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  // null until the profile is loaded, so the banner doesn't flash for verified users
+  const [emailStatus, setEmailStatus] = useState(null);
+
+  // Friends require a confirmed email (the backend answers 403 otherwise)
+  const friendsLocked = emailStatus?.verified === false;
+
+  const handleEmailVerified = useCallback(
+    () => setEmailStatus(prev => prev && { ...prev, verified: true }),
+    []
+  );
 
   // Apply saved theme immediately on mount
   useEffect(() => {
@@ -71,6 +84,7 @@ function App() {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (profileRes.data.role === 'admin') setIsAdmin(true);
+        setEmailStatus({ email: profileRes.data.email, verified: profileRes.data.is_email_verified });
 
         const res = await axios.get(`${API_BASE_URL}/api/settings/`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -147,6 +161,9 @@ function App() {
     <Router basename={import.meta.env.BASE_URL}>
       <div className="App">
         <AppHeader />
+        {token && emailStatus && !emailStatus.verified && (
+          <EmailVerificationBanner email={emailStatus.email} />
+        )}
 
         <ErrorBoundary>
         <Routes>
@@ -169,12 +186,13 @@ function App() {
           <Route path="/flashcards" element={<PrivateRoute token={token} isLoaded={isLoaded}><FlashcardsPage /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute token={token} isLoaded={isLoaded}><AdminPage /></PrivateRoute>} />
 
-          <Route path="/friends" element={<PrivateRoute token={token} isLoaded={isLoaded}><FriendsPage /></PrivateRoute>} />
-          <Route path="/users/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}><PublicProfilePage /></PrivateRoute>} />
+          <Route path="/friends" element={<PrivateRoute token={token} isLoaded={isLoaded}>{friendsLocked ? <FriendsLockedNotice /> : <FriendsPage />}</PrivateRoute>} />
+          <Route path="/users/:id" element={<PrivateRoute token={token} isLoaded={isLoaded}>{friendsLocked ? <FriendsLockedNotice /> : <PublicProfilePage />}</PrivateRoute>} />
           
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage isAuthenticated={!!token} onVerified={handleEmailVerified} />} />
           <Route path="*" element={<Navigate to={token ? "/" : "/auth"} />} />
         </Routes>
         </ErrorBoundary>

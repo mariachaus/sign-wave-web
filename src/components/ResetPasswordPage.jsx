@@ -79,12 +79,8 @@ const ResetPasswordPage = () => {
       });
       setSuccess(true);
     } catch (err) {
-      const detail = err.response?.data?.detail;
-      setError(
-        detail === 'Invalid or expired token'
-          ? t('reset_password_invalid')
-          : getApiErrorMessage(err, t('admin_error_generic'))
-      );
+      const message = getApiErrorMessage(err, t('admin_error_generic'));
+      setError(message === 'Invalid or expired token' ? t('reset_password_invalid') : message);
     } finally {
       setLoading(false);
     }

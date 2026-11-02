@@ -50,6 +50,7 @@ const AuthPage = ({ onLoginSuccess }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ const AuthPage = ({ onLoginSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setInfo('');
 
     if (!isLogin) {
       if (!isPasswordValid(formData.password)) {
@@ -82,9 +84,9 @@ const AuthPage = ({ onLoginSuccess }) => {
         onLoginSuccess(res.data.access_token);
         navigate('/');
       } else {
-        alert('Registration successful! Please log in with your credentials.');
+        setInfo(t('register_success_check_email', { email: formData.email }));
         setIsLogin(true);
-        setFormData({ username: '', email: '', password: '' });
+        setFormData(prev => ({ username: prev.username, email: '', password: '' }));
         setConfirmPassword('');
       }
     } catch (err) {
@@ -97,6 +99,7 @@ const AuthPage = ({ onLoginSuccess }) => {
   const switchMode = () => {
     setIsLogin(v => !v);
     setError('');
+    setInfo('');
     setConfirmPassword('');
     setAgreedToTerms(false);
   };
@@ -113,7 +116,7 @@ const AuthPage = ({ onLoginSuccess }) => {
         onLoginSuccess(res.data.access_token);
         navigate('/');
       } catch (err) {
-        setError(err.response?.data?.detail || 'Google sign-in failed.');
+        setError(getApiErrorMessage(err, 'Google sign-in failed.'));
       } finally {
         setLoading(false);
       }
@@ -157,6 +160,7 @@ const AuthPage = ({ onLoginSuccess }) => {
 
         {/* Error */}
         {error && <div className="auth-error">{error}</div>}
+        {info && <div className="auth-info">{info}</div>}
 
         {/* Form */}
         <form className="auth-form" onSubmit={handleSubmit}>
