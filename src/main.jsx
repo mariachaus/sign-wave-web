@@ -6,7 +6,7 @@ import App from './App.jsx'
 import './i18n';
 import './config/axiosSetup';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'not-configured';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
