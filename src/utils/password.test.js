@@ -1,4 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// i18n.js reads localStorage on import, which the node test environment lacks
+vi.hoisted(() => {
+  globalThis.localStorage = { getItem: () => 'en', setItem: () => {} };
+});
+
 import { isPasswordValid, PASSWORD_RULES } from './password';
 import { getApiErrorMessage } from './apiError';
 
@@ -47,6 +53,16 @@ describe('getApiErrorMessage', () => {
       details: [{ msg: 'Value error, Password must contain at least one digit' }],
     } } };
     expect(getApiErrorMessage(err, 'fallback')).toBe('Password must contain at least one digit');
+  });
+
+  it('shows a localized wait time for 429 using Retry-After', () => {
+    const err = { response: { status: 429, headers: { 'retry-after': '540' }, data: { error: 'Too many attempts.' } } };
+    expect(getApiErrorMessage(err, 'fallback')).toMatch(/9/);
+  });
+
+  it('assumes the full window for 429 without Retry-After', () => {
+    const err = { response: { status: 429, headers: {}, data: {} } };
+    expect(getApiErrorMessage(err, 'fallback')).toMatch(/15/);
   });
 
   it('falls back when there is no response', () => {
